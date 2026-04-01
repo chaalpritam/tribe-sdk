@@ -1,0 +1,27 @@
+{
+  "name": "@tribe-protocol/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Tribe Protocol — decentralized social on Solana",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/web3.js": "^1.95.0",
+    "tweetnacl": "^1.0.3",
+    "protobufjs": "^7.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "files": ["dist", "proto"],
+  "license": "MIT"
+}
