@@ -1,0 +1,72 @@
+syntax = "proto3";
+package tribe;
+
+message TribeMessage {
+  uint32 protocol_version = 1;
+  MessageData data        = 2;
+  bytes hash              = 3;  // blake3(data)
+  bytes signature         = 4;  // ed25519 over hash
+  bytes signer            = 5;  // app key pubkey
+}
+
+message MessageData {
+  MessageType type        = 1;
+  uint64 fid              = 2;
+  uint32 timestamp        = 3;  // unix seconds
+  Network network         = 4;
+  oneof body {
+    CastAddBody cast_add          = 5;
+    CastRemoveBody cast_remove    = 6;
+    ReactionBody reaction         = 7;
+    UserDataBody user_data        = 8;
+  }
+}
+
+message CastAddBody {
+  string text             = 1;  // max 320 chars
+  repeated uint64 mentions = 2;
+  repeated string embeds  = 3;
+  bytes parent_hash       = 4;  // empty if top-level
+  string channel_id       = 5;
+}
+
+message CastRemoveBody {
+  bytes target_hash       = 1;
+}
+
+message ReactionBody {
+  ReactionType type       = 1;
+  bytes target_hash       = 2;
+}
+
+message UserDataBody {
+  string field            = 1;  // "display_name", "bio", "pfp", "url"
+  string value            = 2;
+}
+
+enum MessageType {
+  MESSAGE_TYPE_NONE       = 0;
+  CAST_ADD                = 1;
+  CAST_REMOVE             = 2;
+  REACTION_ADD            = 3;
+  REACTION_REMOVE         = 4;
+  LINK_ADD                = 5;
+  LINK_REMOVE             = 6;
+  USER_DATA_ADD           = 7;
+  USERNAME_PROOF          = 8;
+  CHANNEL_ADD             = 9;
+  CHANNEL_JOIN            = 10;
+  CHANNEL_LEAVE           = 11;
+}
+
+enum ReactionType {
+  REACTION_TYPE_NONE      = 0;
+  LIKE                    = 1;
+  RECAST                  = 2;
+}
+
+enum Network {
+  NETWORK_NONE            = 0;
+  MAINNET                 = 1;
+  DEVNET                  = 2;
+}
