@@ -1,2 +1,2 @@
 export * from "./types";
-export { signMessage, verifyMessage } from "./signer";
+export { signMessage, verifyMessage, decodeMessageData } from "./signer";
