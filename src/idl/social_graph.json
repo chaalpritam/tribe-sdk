@@ -1,0 +1,573 @@
+{
+  "address": "8kKnWvbmTjWq5uPePk79RRbQMAXCszNFzHdRwUS4N74w",
+  "metadata": {
+    "name": "social_graph",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Tribe Protocol — Social Graph Program (PDA-per-relationship)"
+  },
+  "instructions": [
+    {
+      "name": "follow",
+      "docs": [
+        "Follow another user. Creates a Link PDA + increments counters."
+      ],
+      "discriminator": [
+        161,
+        61,
+        150,
+        122,
+        164,
+        153,
+        0,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "follower_fid_record",
+          "docs": [
+            "Follower's FID record — proves custody ownership."
+          ]
+        },
+        {
+          "name": "follower_profile",
+          "docs": [
+            "Follower's social profile — following_count incremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower_fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "following_profile",
+          "docs": [
+            "Target's social profile — followers_count incremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "following_profile.fid",
+                "account": "SocialProfile"
+              }
+            ]
+          }
+        },
+        {
+          "name": "link",
+          "docs": [
+            "The Link PDA — created on follow."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  110,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower_fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "account",
+                "path": "following_profile.fid",
+                "account": "SocialProfile"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_profile",
+      "docs": [
+        "Initialize a social profile for an FID (once per user)."
+      ],
+      "discriminator": [
+        210,
+        162,
+        212,
+        95,
+        95,
+        186,
+        89,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "social_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unfollow",
+      "docs": [
+        "Unfollow a user. Closes Link PDA + decrements counters + reclaims rent."
+      ],
+      "discriminator": [
+        122,
+        47,
+        24,
+        161,
+        12,
+        85,
+        224,
+        68
+      ],
+      "accounts": [
+        {
+          "name": "follower_fid_record",
+          "docs": [
+            "Follower's FID record — proves custody ownership."
+          ]
+        },
+        {
+          "name": "follower_profile",
+          "docs": [
+            "Follower's social profile — following_count decremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower_fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "following_profile",
+          "docs": [
+            "Target's social profile — followers_count decremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "following_profile.fid",
+                "account": "SocialProfile"
+              }
+            ]
+          }
+        },
+        {
+          "name": "link",
+          "docs": [
+            "The Link PDA — closed on unfollow, rent reclaimed."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  110,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "follower_fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "account",
+                "path": "following_profile.fid",
+                "account": "SocialProfile"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "FidRecord",
+      "discriminator": [
+        49,
+        19,
+        96,
+        1,
+        141,
+        101,
+        23,
+        212
+      ]
+    },
+    {
+      "name": "Link",
+      "discriminator": [
+        90,
+        57,
+        179,
+        207,
+        13,
+        91,
+        161,
+        190
+      ]
+    },
+    {
+      "name": "SocialProfile",
+      "discriminator": [
+        249,
+        150,
+        114,
+        66,
+        95,
+        18,
+        251,
+        40
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "Followed",
+      "discriminator": [
+        236,
+        182,
+        255,
+        24,
+        25,
+        185,
+        209,
+        23
+      ]
+    },
+    {
+      "name": "ProfileInitialized",
+      "discriminator": [
+        1,
+        31,
+        122,
+        19,
+        193,
+        205,
+        23,
+        27
+      ]
+    },
+    {
+      "name": "Unfollowed",
+      "discriminator": [
+        181,
+        126,
+        70,
+        2,
+        95,
+        63,
+        168,
+        239
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedCustody",
+      "msg": "Unauthorized: signer is not the FID custody address"
+    },
+    {
+      "code": 6001,
+      "name": "CannotFollowSelf",
+      "msg": "Cannot follow yourself"
+    },
+    {
+      "code": 6002,
+      "name": "ProfileAlreadyExists",
+      "msg": "Profile already initialized"
+    }
+  ],
+  "types": [
+    {
+      "name": "FidRecord",
+      "docs": [
+        "FID record from fid-registry (cross-program read)."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "custody_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "recovery_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "registered_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Followed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "follower_fid",
+            "type": "u64"
+          },
+          {
+            "name": "following_fid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Link",
+      "docs": [
+        "A single follow relationship. PDA-per-relationship model.",
+        "",
+        "- O(1) follow / unfollow (create / close one small PDA)",
+        "- O(1) \"does A follow B?\" (derive PDA, check if it exists)",
+        "- Unlimited follows per user (no Vec, no account size limit)",
+        "- Unfollow reclaims rent (~0.001 SOL back to follower)"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "follower_fid",
+            "type": "u64"
+          },
+          {
+            "name": "following_fid",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProfileInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SocialProfile",
+      "docs": [
+        "Social profile — stores only counters. One per FID."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "following_count",
+            "type": "u32"
+          },
+          {
+            "name": "followers_count",
+            "type": "u32"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Unfollowed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "follower_fid",
+            "type": "u64"
+          },
+          {
+            "name": "following_fid",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

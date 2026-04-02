@@ -77,7 +77,7 @@ export class CastClient {
 
     const res = await fetch(`${this.castServerUrl}/v1/castsByFid/${fid}?${params}`);
     if (!res.ok) throw new Error(`Cast server error: ${res.status}`);
-    return res.json();
+    return (await res.json()) as CastPage;
   }
 
   /**
@@ -87,7 +87,7 @@ export class CastClient {
     const res = await fetch(`${this.castServerUrl}/v1/cast/${hash}`);
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`Cast server error: ${res.status}`);
-    return res.json();
+    return (await res.json()) as Cast;
   }
 
   private async submitMessage(message: TribeMessage): Promise<string> {
@@ -103,7 +103,7 @@ export class CastClient {
       }, (_, v) => (typeof v === "bigint" ? v.toString() : v)),
     });
     if (!res.ok) throw new Error(`Submit failed: ${res.status}`);
-    const result = await res.json();
+    const result = (await res.json()) as { hash: string };
     return result.hash;
   }
 }

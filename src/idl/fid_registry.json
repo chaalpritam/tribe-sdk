@@ -1,0 +1,709 @@
+{
+  "address": "4BSmJmRGQWKgioP9DG2bUuRS9U3V6soRauU7Nv6yGvHD",
+  "metadata": {
+    "name": "fid_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Tribe Protocol — FID Registry Program"
+  },
+  "instructions": [
+    {
+      "name": "change_recovery",
+      "docs": [
+        "Change the recovery address."
+      ],
+      "discriminator": [
+        254,
+        25,
+        164,
+        234,
+        166,
+        184,
+        90,
+        64
+      ],
+      "accounts": [
+        {
+          "name": "fid_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_recovery",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Initialize the global state (once, by deployer)."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "global_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "recover",
+      "docs": [
+        "Recover FID using the recovery address."
+      ],
+      "discriminator": [
+        108,
+        216,
+        38,
+        58,
+        109,
+        146,
+        116,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "fid_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_custody_lookup",
+          "docs": [
+            "Old custody lookup — will be closed."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.custody_address",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_custody_lookup",
+          "docs": [
+            "New custody lookup."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "new_custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_custody"
+        },
+        {
+          "name": "recovery",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_custody",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "register",
+      "docs": [
+        "Register a new FID for the signer."
+      ],
+      "discriminator": [
+        211,
+        124,
+        67,
+        15,
+        211,
+        194,
+        178,
+        240
+      ],
+      "accounts": [
+        {
+          "name": "global_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fid_record",
+          "writable": true
+        },
+        {
+          "name": "custody_lookup",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "recovery_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "transfer",
+      "docs": [
+        "Transfer FID custody to a new wallet."
+      ],
+      "discriminator": [
+        163,
+        52,
+        200,
+        231,
+        140,
+        3,
+        69,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "fid_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_custody_lookup",
+          "docs": [
+            "Old custody lookup — will be closed."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_custody_lookup",
+          "docs": [
+            "New custody lookup — will be created."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "new_custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_custody"
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_custody",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CustodyLookup",
+      "discriminator": [
+        204,
+        110,
+        46,
+        108,
+        239,
+        224,
+        255,
+        168
+      ]
+    },
+    {
+      "name": "FidRecord",
+      "discriminator": [
+        49,
+        19,
+        96,
+        1,
+        141,
+        101,
+        23,
+        212
+      ]
+    },
+    {
+      "name": "GlobalState",
+      "discriminator": [
+        163,
+        46,
+        74,
+        168,
+        216,
+        123,
+        133,
+        98
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "FidRecovered",
+      "discriminator": [
+        138,
+        177,
+        126,
+        159,
+        15,
+        249,
+        127,
+        229
+      ]
+    },
+    {
+      "name": "FidRegistered",
+      "discriminator": [
+        174,
+        78,
+        248,
+        176,
+        102,
+        96,
+        22,
+        67
+      ]
+    },
+    {
+      "name": "FidTransferred",
+      "discriminator": [
+        17,
+        25,
+        92,
+        175,
+        17,
+        132,
+        242,
+        174
+      ]
+    },
+    {
+      "name": "RecoveryChanged",
+      "discriminator": [
+        148,
+        61,
+        129,
+        49,
+        38,
+        189,
+        70,
+        66
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedCustody",
+      "msg": "Unauthorized: signer is not the custody address"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedRecovery",
+      "msg": "Unauthorized: signer is not the recovery address"
+    },
+    {
+      "code": 6002,
+      "name": "SameCustodyAddress",
+      "msg": "Cannot transfer to the same custody address"
+    },
+    {
+      "code": 6003,
+      "name": "SameRecoveryAddress",
+      "msg": "Cannot set recovery to the same address"
+    }
+  ],
+  "types": [
+    {
+      "name": "CustodyLookup",
+      "docs": [
+        "Reverse lookup: custody_address → fid."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidRecord",
+      "docs": [
+        "Core identity record — one per user."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "docs": [
+              "Unique numeric identity (auto-incremented)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "custody_address",
+            "docs": [
+              "Primary wallet that controls this FID."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "recovery_address",
+            "docs": [
+              "Can reclaim FID if custody key is lost."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "registered_at",
+            "docs": [
+              "Unix timestamp of registration."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidRecovered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "old_custody",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_custody",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "custody_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "recovery_address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "old_custody",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_custody",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid_counter",
+            "docs": [
+              "Auto-incrementing FID counter."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "Authority that initialized the program (governance)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecoveryChanged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "old_recovery",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_recovery",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
-import { PublicKey, TransactionSignature } from "@solana/web3.js";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { PublicKey, SystemProgram, TransactionSignature } from "@solana/web3.js";
+import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { NetworkConfig } from "../network/types";
+import idl from "../idl/fid_registry.json";
 
 export interface FidRecord {
   fid: bigint;
@@ -10,61 +11,147 @@ export interface FidRecord {
 }
 
 export class FidClient {
+  private program: Program;
+
   constructor(
     private provider: AnchorProvider,
     private config: NetworkConfig
-  ) {}
+  ) {
+    this.program = new Program(idl as any, provider);
+  }
 
   /**
    * Register a new FID for the connected wallet.
    */
   async register(recoveryAddress: PublicKey): Promise<{ fid: bigint; txSig: string }> {
-    // TODO: Call fid_registry.register(recovery_address)
-    // 1. Derive GlobalState PDA
-    // 2. Derive FidRecord PDA (using next fid counter)
-    // 3. Derive CustodyLookup PDA
-    // 4. Send transaction
-    throw new Error("Not implemented — requires IDL from anchor build");
+    // Read current fid counter to derive the FidRecord PDA
+    const [globalState] = PublicKey.findProgramAddressSync(
+      [Buffer.from("global_state")],
+      this.config.programIds.fidRegistry
+    );
+
+    const state = await (this.program.account as any).globalState.fetch(globalState);
+    const nextFid = (state as any).fidCounter as BN;
+
+    const [fidRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("fid"), nextFid.toArrayLike(Buffer, "le", 8)],
+      this.config.programIds.fidRegistry
+    );
+
+    const [custodyLookup] = PublicKey.findProgramAddressSync(
+      [Buffer.from("custody"), this.provider.wallet.publicKey.toBuffer()],
+      this.config.programIds.fidRegistry
+    );
+
+    const txSig = await this.program.methods
+      .register(recoveryAddress)
+      .accounts({
+        globalState,
+        fidRecord,
+        custodyLookup,
+        custody: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    return { fid: BigInt(nextFid.toString()), txSig };
   }
 
   /**
    * Transfer FID custody to a new wallet.
    */
   async transfer(fid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
-    // TODO: Call fid_registry.transfer(new_custody)
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const [fidRecord] = this.deriveFidRecord(fid);
+
+    const [oldCustodyLookup] = PublicKey.findProgramAddressSync(
+      [Buffer.from("custody"), this.provider.wallet.publicKey.toBuffer()],
+      this.config.programIds.fidRegistry
+    );
+
+    const [newCustodyLookup] = PublicKey.findProgramAddressSync(
+      [Buffer.from("custody"), newCustody.toBuffer()],
+      this.config.programIds.fidRegistry
+    );
+
+    return this.program.methods
+      .transfer(newCustody)
+      .accounts({
+        fidRecord,
+        oldCustodyLookup,
+        newCustodyLookup,
+        newCustody,
+        custody: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
   }
 
   /**
    * Recover FID using the recovery address.
    */
   async recover(fid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
-    // TODO: Call fid_registry.recover(new_custody)
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const [fidRecord] = this.deriveFidRecord(fid);
+
+    // Fetch current custody to derive old lookup PDA
+    const record = await (this.program.account as any).fidRecord.fetch(fidRecord);
+    const oldCustodyAddress = (record as any).custodyAddress as PublicKey;
+
+    const [oldCustodyLookup] = PublicKey.findProgramAddressSync(
+      [Buffer.from("custody"), oldCustodyAddress.toBuffer()],
+      this.config.programIds.fidRegistry
+    );
+
+    const [newCustodyLookup] = PublicKey.findProgramAddressSync(
+      [Buffer.from("custody"), newCustody.toBuffer()],
+      this.config.programIds.fidRegistry
+    );
+
+    return this.program.methods
+      .recover(newCustody)
+      .accounts({
+        fidRecord,
+        oldCustodyLookup,
+        newCustodyLookup,
+        newCustody,
+        recovery: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
   }
 
   /**
    * Change the recovery address for an FID.
    */
   async changeRecovery(fid: bigint, newRecovery: PublicKey): Promise<TransactionSignature> {
-    // TODO: Call fid_registry.change_recovery(new_recovery)
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const [fidRecord] = this.deriveFidRecord(fid);
+
+    return this.program.methods
+      .changeRecovery(newRecovery)
+      .accounts({
+        fidRecord,
+        custody: this.provider.wallet.publicKey,
+      })
+      .rpc();
   }
 
   /**
    * Fetch an FID record by FID number.
    */
   async getFid(fid: bigint): Promise<FidRecord | null> {
-    const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), this.fidToBuffer(fid)],
-      this.config.programIds.fidRegistry
-    );
+    const [pda] = this.deriveFidRecord(fid);
 
-    const accountInfo = await this.provider.connection.getAccountInfo(pda);
-    if (!accountInfo) return null;
-
-    // TODO: Deserialize using IDL types
-    return null;
+    try {
+      const account = await (this.program.account as any).fidRecord.fetch(pda);
+      const data = account as any;
+      return {
+        fid: BigInt(data.fid.toString()),
+        custodyAddress: data.custodyAddress,
+        recoveryAddress: data.recoveryAddress,
+        registeredAt: (data.registeredAt as BN).toNumber(),
+      };
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -76,11 +163,19 @@ export class FidClient {
       this.config.programIds.fidRegistry
     );
 
-    const accountInfo = await this.provider.connection.getAccountInfo(pda);
-    if (!accountInfo) return null;
+    try {
+      const account = await (this.program.account as any).custodyLookup.fetch(pda);
+      return BigInt((account as any).fid.toString());
+    } catch {
+      return null;
+    }
+  }
 
-    // TODO: Deserialize CustodyLookup
-    return null;
+  private deriveFidRecord(fid: bigint): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("fid"), this.fidToBuffer(fid)],
+      this.config.programIds.fidRegistry
+    );
   }
 
   private fidToBuffer(fid: bigint): Buffer {

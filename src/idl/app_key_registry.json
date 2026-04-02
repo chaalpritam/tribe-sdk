@@ -1,0 +1,497 @@
+{
+  "address": "5LtbFUeAoXWRovGpyWnRJhiCS62XsTYKVErT9kPpv4hN",
+  "metadata": {
+    "name": "app_key_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Tribe Protocol — App Key Registry Program"
+  },
+  "instructions": [
+    {
+      "name": "add_app_key",
+      "docs": [
+        "Add a new app key for an FID."
+      ],
+      "discriminator": [
+        201,
+        126,
+        254,
+        221,
+        111,
+        252,
+        221,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "fid_record",
+          "docs": [
+            "The FID record — verifies custody ownership."
+          ]
+        },
+        {
+          "name": "app_key_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  112,
+                  112,
+                  95,
+                  107,
+                  101,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "arg",
+                "path": "app_pubkey"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "app_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "scope",
+          "type": "u8"
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "revoke_app_key",
+      "docs": [
+        "Revoke an existing app key."
+      ],
+      "discriminator": [
+        46,
+        9,
+        208,
+        7,
+        74,
+        75,
+        169,
+        169
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "app_key_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  112,
+                  112,
+                  95,
+                  107,
+                  101,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "account",
+                "path": "app_key_record.app_pubkey",
+                "account": "AppKeyRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "rotate_app_key",
+      "docs": [
+        "Rotate an app key (revoke old + add new atomically)."
+      ],
+      "discriminator": [
+        233,
+        247,
+        134,
+        137,
+        167,
+        106,
+        81,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "old_app_key_record",
+          "docs": [
+            "Old app key — will be marked revoked."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  112,
+                  112,
+                  95,
+                  107,
+                  101,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "account",
+                "path": "old_app_key_record.app_pubkey",
+                "account": "AppKeyRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_app_key_record",
+          "docs": [
+            "New app key — will be created."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  112,
+                  112,
+                  95,
+                  107,
+                  101,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              },
+              {
+                "kind": "arg",
+                "path": "new_app_pubkey"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_app_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "scope",
+          "type": "u8"
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AppKeyRecord",
+      "discriminator": [
+        201,
+        2,
+        223,
+        200,
+        171,
+        124,
+        179,
+        183
+      ]
+    },
+    {
+      "name": "FidRecord",
+      "discriminator": [
+        49,
+        19,
+        96,
+        1,
+        141,
+        101,
+        23,
+        212
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "AppKeyAdded",
+      "discriminator": [
+        104,
+        239,
+        175,
+        80,
+        103,
+        120,
+        36,
+        168
+      ]
+    },
+    {
+      "name": "AppKeyRevoked",
+      "discriminator": [
+        73,
+        251,
+        170,
+        210,
+        164,
+        255,
+        122,
+        225
+      ]
+    },
+    {
+      "name": "AppKeyRotated",
+      "discriminator": [
+        83,
+        219,
+        191,
+        101,
+        104,
+        139,
+        193,
+        20
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedCustody",
+      "msg": "Unauthorized: signer is not the FID custody address"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidScope",
+      "msg": "Invalid scope value (must be 0-3)"
+    },
+    {
+      "code": 6002,
+      "name": "AlreadyRevoked",
+      "msg": "App key is already revoked"
+    },
+    {
+      "code": 6003,
+      "name": "Expired",
+      "msg": "App key has expired"
+    }
+  ],
+  "types": [
+    {
+      "name": "AppKeyAdded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "app_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "scope",
+            "type": "u8"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppKeyRecord",
+      "docs": [
+        "Scoped delegation key — apps sign on behalf of users."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "docs": [
+              "The FID this key belongs to."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "app_pubkey",
+            "docs": [
+              "The ephemeral pubkey the app uses to sign messages."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "scope",
+            "docs": [
+              "Permission scope: 0=Full, 1=CastsOnly, 2=SocialOnly, 3=ReadOnly."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "When this key was created."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "expires_at",
+            "docs": [
+              "Expiry timestamp (0 = no expiry)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "revoked",
+            "docs": [
+              "Whether this key has been revoked."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppKeyRevoked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "app_pubkey",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppKeyRotated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "old_app_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_app_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "scope",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidRecord",
+      "docs": [
+        "FID record from the fid-registry program (read-only cross-program reference)."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "custody_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "recovery_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "registered_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

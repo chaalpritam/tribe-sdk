@@ -1,6 +1,7 @@
-import { PublicKey, TransactionSignature } from "@solana/web3.js";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { PublicKey, SystemProgram, TransactionSignature } from "@solana/web3.js";
+import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { NetworkConfig } from "../network/types";
+import appKeyIdl from "../idl/app_key_registry.json";
 
 export enum AppKeyScope {
   Full = 0,
@@ -19,10 +20,14 @@ export interface AppKeyRecord {
 }
 
 export class AppKeyClient {
+  private program: Program;
+
   constructor(
     private provider: AnchorProvider,
     private config: NetworkConfig
-  ) {}
+  ) {
+    this.program = new Program(appKeyIdl as any, provider);
+  }
 
   /**
    * Add an app key for an FID. Custody address must sign.
@@ -33,16 +38,41 @@ export class AppKeyClient {
     scope: AppKeyScope,
     expiresAt: number = 0
   ): Promise<TransactionSignature> {
-    // TODO: Call app_key_registry.add_app_key(app_pubkey, scope, expires_at)
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const fidRecord = this.deriveFidRecord(fid);
+    const [appKeyRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("app_key"), this.fidToBuffer(fid), appPubkey.toBuffer()],
+      this.config.programIds.appKeyRegistry
+    );
+
+    return this.program.methods
+      .addAppKey(appPubkey, scope, new BN(expiresAt))
+      .accounts({
+        fidRecord,
+        appKeyRecord,
+        custody: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
   }
 
   /**
    * Revoke an app key.
    */
   async revokeAppKey(fid: bigint, appPubkey: PublicKey): Promise<TransactionSignature> {
-    // TODO: Call app_key_registry.revoke_app_key()
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const fidRecord = this.deriveFidRecord(fid);
+    const [appKeyRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("app_key"), this.fidToBuffer(fid), appPubkey.toBuffer()],
+      this.config.programIds.appKeyRegistry
+    );
+
+    return this.program.methods
+      .revokeAppKey()
+      .accounts({
+        fidRecord,
+        appKeyRecord,
+        custody: this.provider.wallet.publicKey,
+      })
+      .rpc();
   }
 
   /**
@@ -55,8 +85,28 @@ export class AppKeyClient {
     scope: AppKeyScope,
     expiresAt: number = 0
   ): Promise<TransactionSignature> {
-    // TODO: Call app_key_registry.rotate_app_key(new_app_pubkey, scope, expires_at)
-    throw new Error("Not implemented — requires IDL from anchor build");
+    const fidRecord = this.deriveFidRecord(fid);
+
+    const [oldAppKeyRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("app_key"), this.fidToBuffer(fid), oldAppPubkey.toBuffer()],
+      this.config.programIds.appKeyRegistry
+    );
+
+    const [newAppKeyRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("app_key"), this.fidToBuffer(fid), newAppPubkey.toBuffer()],
+      this.config.programIds.appKeyRegistry
+    );
+
+    return this.program.methods
+      .rotateAppKey(newAppPubkey, scope, new BN(expiresAt))
+      .accounts({
+        fidRecord,
+        oldAppKeyRecord,
+        newAppKeyRecord,
+        custody: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
   }
 
   /**
@@ -68,11 +118,28 @@ export class AppKeyClient {
       this.config.programIds.appKeyRegistry
     );
 
-    const accountInfo = await this.provider.connection.getAccountInfo(pda);
-    if (!accountInfo) return null;
+    try {
+      const account = await (this.program.account as any).appKeyRecord.fetch(pda);
+      const data = account as any;
+      return {
+        fid: BigInt(data.fid.toString()),
+        appPubkey: data.appPubkey,
+        scope: data.scope as AppKeyScope,
+        createdAt: (data.createdAt as BN).toNumber(),
+        expiresAt: (data.expiresAt as BN).toNumber(),
+        revoked: data.revoked,
+      };
+    } catch {
+      return null;
+    }
+  }
 
-    // TODO: Deserialize using IDL types
-    return null;
+  private deriveFidRecord(fid: bigint): PublicKey {
+    const [pda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("fid"), this.fidToBuffer(fid)],
+      this.config.programIds.fidRegistry
+    );
+    return pda;
   }
 
   private fidToBuffer(fid: bigint): Buffer {

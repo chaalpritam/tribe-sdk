@@ -1,0 +1,546 @@
+{
+  "address": "65oKjSjcGYR61ASzDYczbodz6H8TARtJyQGvb5V9y9W1",
+  "metadata": {
+    "name": "username_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Tribe Protocol — Username Registry Program"
+  },
+  "instructions": [
+    {
+      "name": "register_username",
+      "docs": [
+        "Register a username for an FID."
+      ],
+      "discriminator": [
+        134,
+        54,
+        123,
+        181,
+        28,
+        151,
+        36,
+        0
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "username_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  110,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "username"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fid_username",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  105,
+                  100,
+                  95,
+                  117,
+                  115,
+                  101,
+                  114,
+                  110,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "username",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "release_username",
+      "docs": [
+        "Release a username (close account, reclaim rent)."
+      ],
+      "discriminator": [
+        216,
+        163,
+        188,
+        29,
+        37,
+        50,
+        178,
+        65
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "username_record",
+          "writable": true
+        },
+        {
+          "name": "fid_username",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  105,
+                  100,
+                  95,
+                  117,
+                  115,
+                  101,
+                  114,
+                  110,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "fid_record.fid",
+                "account": "FidRecord"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "renew_username",
+      "docs": [
+        "Renew a username (extend expiry)."
+      ],
+      "discriminator": [
+        100,
+        232,
+        117,
+        122,
+        15,
+        214,
+        159,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "fid_record"
+        },
+        {
+          "name": "username_record",
+          "writable": true
+        },
+        {
+          "name": "custody",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transfer_username",
+      "docs": [
+        "Transfer a username to a different FID."
+      ],
+      "discriminator": [
+        249,
+        219,
+        120,
+        168,
+        30,
+        177,
+        38,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "fid_record",
+          "docs": [
+            "Current owner's FID record."
+          ]
+        },
+        {
+          "name": "username_record",
+          "writable": true
+        },
+        {
+          "name": "custody",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_fid",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "FidRecord",
+      "discriminator": [
+        49,
+        19,
+        96,
+        1,
+        141,
+        101,
+        23,
+        212
+      ]
+    },
+    {
+      "name": "FidUsername",
+      "discriminator": [
+        109,
+        89,
+        50,
+        148,
+        222,
+        8,
+        255,
+        120
+      ]
+    },
+    {
+      "name": "UsernameRecord",
+      "discriminator": [
+        42,
+        172,
+        136,
+        41,
+        240,
+        123,
+        100,
+        204
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "UsernameRegistered",
+      "discriminator": [
+        241,
+        79,
+        103,
+        207,
+        185,
+        19,
+        151,
+        5
+      ]
+    },
+    {
+      "name": "UsernameReleased",
+      "discriminator": [
+        42,
+        199,
+        119,
+        19,
+        138,
+        241,
+        154,
+        121
+      ]
+    },
+    {
+      "name": "UsernameRenewed",
+      "discriminator": [
+        15,
+        253,
+        90,
+        7,
+        56,
+        155,
+        126,
+        135
+      ]
+    },
+    {
+      "name": "UsernameTransferred",
+      "discriminator": [
+        144,
+        34,
+        65,
+        80,
+        117,
+        49,
+        239,
+        110
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedCustody",
+      "msg": "Unauthorized: signer is not the FID custody address"
+    },
+    {
+      "code": 6001,
+      "name": "UsernameTooLong",
+      "msg": "Username too long (max 20 characters)"
+    },
+    {
+      "code": 6002,
+      "name": "UsernameTooShort",
+      "msg": "Username too short (min 1 character)"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidCharacters",
+      "msg": "Username contains invalid characters (alphanumeric + underscore only)"
+    },
+    {
+      "code": 6004,
+      "name": "NotExpired",
+      "msg": "Username has not expired yet"
+    },
+    {
+      "code": 6005,
+      "name": "Expired",
+      "msg": "Username has expired"
+    }
+  ],
+  "types": [
+    {
+      "name": "FidRecord",
+      "docs": [
+        "FID record from fid-registry (cross-program read)."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "custody_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "recovery_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "registered_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FidUsername",
+      "docs": [
+        "Reverse lookup: FID → username hash."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UsernameRecord",
+      "docs": [
+        "Username record — human-readable name bound to an FID."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "docs": [
+              "Fixed-size username (padded with zeros). Avoids realloc."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "username_len",
+            "docs": [
+              "Actual length of the username string."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "fid",
+            "docs": [
+              "The FID this username is bound to."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "registered_at",
+            "docs": [
+              "Unix timestamp of registration."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "expiry",
+            "docs": [
+              "Expiry timestamp (annual renewal)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UsernameRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "expiry",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UsernameReleased",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "fid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UsernameRenewed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "fid",
+            "type": "u64"
+          },
+          {
+            "name": "new_expiry",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UsernameTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "old_fid",
+            "type": "u64"
+          },
+          {
+            "name": "new_fid",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
