@@ -21,28 +21,28 @@ export class DirectSolanaProvider implements ExecutionProvider {
     this.program = new Program(socialGraphIdl as any, provider);
   }
 
-  async follow(followerFid: bigint, followingFid: bigint): Promise<string> {
-    const followerFidRecord = this.deriveFidRecord(followerFid);
+  async follow(followerTid: bigint, followingTid: bigint): Promise<string> {
+    const followerTidRecord = this.deriveTidRecord(followerTid);
 
     const [followerProfile] = PublicKey.findProgramAddressSync(
-      [Buffer.from("social_profile"), this.fidToBuffer(followerFid)],
+      [Buffer.from("social_profile"), this.tidToBuffer(followerTid)],
       this.config.programIds.socialGraph
     );
 
     const [followingProfile] = PublicKey.findProgramAddressSync(
-      [Buffer.from("social_profile"), this.fidToBuffer(followingFid)],
+      [Buffer.from("social_profile"), this.tidToBuffer(followingTid)],
       this.config.programIds.socialGraph
     );
 
     const [link] = PublicKey.findProgramAddressSync(
-      [Buffer.from("link"), this.fidToBuffer(followerFid), this.fidToBuffer(followingFid)],
+      [Buffer.from("link"), this.tidToBuffer(followerTid), this.tidToBuffer(followingTid)],
       this.config.programIds.socialGraph
     );
 
     return this.program.methods
       .follow()
       .accounts({
-        followerFidRecord,
+        followerTidRecord,
         followerProfile,
         followingProfile,
         link,
@@ -52,28 +52,28 @@ export class DirectSolanaProvider implements ExecutionProvider {
       .rpc();
   }
 
-  async unfollow(followerFid: bigint, followingFid: bigint): Promise<string> {
-    const followerFidRecord = this.deriveFidRecord(followerFid);
+  async unfollow(followerTid: bigint, followingTid: bigint): Promise<string> {
+    const followerTidRecord = this.deriveTidRecord(followerTid);
 
     const [followerProfile] = PublicKey.findProgramAddressSync(
-      [Buffer.from("social_profile"), this.fidToBuffer(followerFid)],
+      [Buffer.from("social_profile"), this.tidToBuffer(followerTid)],
       this.config.programIds.socialGraph
     );
 
     const [followingProfile] = PublicKey.findProgramAddressSync(
-      [Buffer.from("social_profile"), this.fidToBuffer(followingFid)],
+      [Buffer.from("social_profile"), this.tidToBuffer(followingTid)],
       this.config.programIds.socialGraph
     );
 
     const [link] = PublicKey.findProgramAddressSync(
-      [Buffer.from("link"), this.fidToBuffer(followerFid), this.fidToBuffer(followingFid)],
+      [Buffer.from("link"), this.tidToBuffer(followerTid), this.tidToBuffer(followingTid)],
       this.config.programIds.socialGraph
     );
 
     return this.program.methods
       .unfollow()
       .accounts({
-        followerFidRecord,
+        followerTidRecord,
         followerProfile,
         followingProfile,
         link,
@@ -82,9 +82,9 @@ export class DirectSolanaProvider implements ExecutionProvider {
       .rpc();
   }
 
-  async getLink(followerFid: bigint, followingFid: bigint): Promise<Link | null> {
+  async getLink(followerTid: bigint, followingTid: bigint): Promise<Link | null> {
     const [linkPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("link"), this.fidToBuffer(followerFid), this.fidToBuffer(followingFid)],
+      [Buffer.from("link"), this.tidToBuffer(followerTid), this.tidToBuffer(followingTid)],
       this.config.programIds.socialGraph
     );
 
@@ -92,8 +92,8 @@ export class DirectSolanaProvider implements ExecutionProvider {
       const account = await (this.program.account as any).link.fetch(linkPda);
       const data = account as any;
       return {
-        followerFid: BigInt(data.followerFid.toString()),
-        followingFid: BigInt(data.followingFid.toString()),
+        followerTid: BigInt(data.followerTid.toString()),
+        followingTid: BigInt(data.followingTid.toString()),
         createdAt: (data.createdAt as BN).toNumber(),
       };
     } catch {
@@ -101,9 +101,9 @@ export class DirectSolanaProvider implements ExecutionProvider {
     }
   }
 
-  async getProfile(fid: bigint): Promise<SocialProfile | null> {
+  async getProfile(tid: bigint): Promise<SocialProfile | null> {
     const [profilePda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("social_profile"), this.fidToBuffer(fid)],
+      [Buffer.from("social_profile"), this.tidToBuffer(tid)],
       this.config.programIds.socialGraph
     );
 
@@ -111,7 +111,7 @@ export class DirectSolanaProvider implements ExecutionProvider {
       const account = await (this.program.account as any).socialProfile.fetch(profilePda);
       const data = account as any;
       return {
-        fid: BigInt(data.fid.toString()),
+        tid: BigInt(data.tid.toString()),
         followingCount: data.followingCount,
         followersCount: data.followersCount,
       };
@@ -120,17 +120,17 @@ export class DirectSolanaProvider implements ExecutionProvider {
     }
   }
 
-  private deriveFidRecord(fid: bigint): PublicKey {
+  private deriveTidRecord(tid: bigint): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), this.fidToBuffer(fid)],
-      this.config.programIds.fidRegistry
+      [Buffer.from("tid"), this.tidToBuffer(tid)],
+      this.config.programIds.tidRegistry
     );
     return pda;
   }
 
-  private fidToBuffer(fid: bigint): Buffer {
+  private tidToBuffer(tid: bigint): Buffer {
     const buf = Buffer.alloc(8);
-    buf.writeBigUInt64LE(fid);
+    buf.writeBigUInt64LE(tid);
     return buf;
   }
 }

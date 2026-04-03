@@ -3,14 +3,14 @@ import { signMessage } from "../messages/signer";
 import {
   MessageType,
   MessageData,
-  CastAddBody,
+  TweetAddBody,
   Network,
   TribeMessage,
 } from "../messages/types";
 
-export interface Cast {
+export interface Tweet {
   hash: string;
-  fid: bigint;
+  tid: bigint;
   text: string;
   mentions: bigint[];
   embeds: string[];
@@ -19,26 +19,26 @@ export interface Cast {
   timestamp: number;
 }
 
-export interface CastPage {
-  casts: Cast[];
+export interface TweetPage {
+  tweets: Tweet[];
   cursor?: string;
 }
 
 /**
- * Cast operations — talks to the cast server via HTTP.
+ * Tweet operations — talks to the tweet server via HTTP.
  */
-export class CastClient {
-  private castServerUrl: string;
+export class TweetClient {
+  private tweetServerUrl: string;
 
   constructor(private config: NetworkConfig) {
-    this.castServerUrl = config.castServerUrl;
+    this.tweetServerUrl = config.tweetServerUrl;
   }
 
   /**
-   * Publish a new cast. Signs with the app key and submits to cast server.
+   * Publish a new tweet. Signs with the app key and submits to tweet server.
    */
   async publish(
-    fid: bigint,
+    tid: bigint,
     text: string,
     signingKey: Uint8Array,
     options?: {
@@ -48,7 +48,7 @@ export class CastClient {
       channelId?: string;
     }
   ): Promise<string> {
-    const body: CastAddBody = {
+    const body: TweetAddBody = {
       text,
       mentions: options?.mentions ?? [],
       embeds: options?.embeds ?? [],
@@ -57,8 +57,8 @@ export class CastClient {
     };
 
     const data: MessageData = {
-      type: MessageType.CAST_ADD,
-      fid,
+      type: MessageType.TWEET_ADD,
+      tid,
       timestamp: Math.floor(Date.now() / 1000),
       network: this.config.cluster === "mainnet-beta" ? Network.MAINNET : Network.DEVNET,
       body,
@@ -69,29 +69,29 @@ export class CastClient {
   }
 
   /**
-   * Get casts by FID (paginated).
+   * Get tweets by TID (paginated).
    */
-  async getCastsByFid(fid: bigint, limit = 20, cursor?: string): Promise<CastPage> {
+  async getTweetsByTid(tid: bigint, limit = 20, cursor?: string): Promise<TweetPage> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
 
-    const res = await fetch(`${this.castServerUrl}/v1/castsByFid/${fid}?${params}`);
-    if (!res.ok) throw new Error(`Cast server error: ${res.status}`);
-    return (await res.json()) as CastPage;
+    const res = await fetch(`${this.tweetServerUrl}/v1/tweetsByTid/${tid}?${params}`);
+    if (!res.ok) throw new Error(`Tweet server error: ${res.status}`);
+    return (await res.json()) as TweetPage;
   }
 
   /**
-   * Get a single cast by hash.
+   * Get a single tweet by hash.
    */
-  async getCast(hash: string): Promise<Cast | null> {
-    const res = await fetch(`${this.castServerUrl}/v1/cast/${hash}`);
+  async getTweet(hash: string): Promise<Tweet | null> {
+    const res = await fetch(`${this.tweetServerUrl}/v1/tweet/${hash}`);
     if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`Cast server error: ${res.status}`);
-    return (await res.json()) as Cast;
+    if (!res.ok) throw new Error(`Tweet server error: ${res.status}`);
+    return (await res.json()) as Tweet;
   }
 
   private async submitMessage(message: TribeMessage): Promise<string> {
-    const res = await fetch(`${this.castServerUrl}/v1/submitMessage`, {
+    const res = await fetch(`${this.tweetServerUrl}/v1/submitMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

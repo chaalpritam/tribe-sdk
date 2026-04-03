@@ -6,20 +6,20 @@ import { ExecutionProvider, SocialProfile, Link } from "../execution/types";
 export class GraphClient {
   constructor(private execution: ExecutionProvider) {}
 
-  async follow(followerFid: bigint, followingFid: bigint): Promise<string> {
-    return this.execution.follow(followerFid, followingFid);
+  async follow(followerTid: bigint, followingTid: bigint): Promise<string> {
+    return this.execution.follow(followerTid, followingTid);
   }
 
-  async unfollow(followerFid: bigint, followingFid: bigint): Promise<string> {
-    return this.execution.unfollow(followerFid, followingFid);
+  async unfollow(followerTid: bigint, followingTid: bigint): Promise<string> {
+    return this.execution.unfollow(followerTid, followingTid);
   }
 
-  async isFollowing(followerFid: bigint, followingFid: bigint): Promise<boolean> {
-    const link = await this.execution.getLink(followerFid, followingFid);
+  async isFollowing(followerTid: bigint, followingTid: bigint): Promise<boolean> {
+    const link = await this.execution.getLink(followerTid, followingTid);
     return link !== null;
   }
 
-  async getProfile(fid: bigint): Promise<SocialProfile | null> {
-    return this.execution.getProfile(fid);
+  async getProfile(tid: bigint): Promise<SocialProfile | null> {
+    return this.execution.getProfile(tid);
   }
 }

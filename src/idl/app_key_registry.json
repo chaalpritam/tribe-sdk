@@ -10,7 +10,7 @@
     {
       "name": "add_app_key",
       "docs": [
-        "Add a new app key for an FID."
+        "Add a new app key for a TID."
       ],
       "discriminator": [
         201,
@@ -24,9 +24,9 @@
       ],
       "accounts": [
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "docs": [
-            "The FID record — verifies custody ownership."
+            "The TID record — verifies custody ownership."
           ]
         },
         {
@@ -48,8 +48,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "arg",
@@ -100,7 +100,7 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "app_key_record",
@@ -121,8 +121,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "account",
@@ -156,7 +156,7 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "old_app_key_record",
@@ -180,8 +180,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "account",
@@ -213,8 +213,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "arg",
@@ -264,7 +264,7 @@
       ]
     },
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "discriminator": [
         49,
         19,
@@ -322,7 +322,7 @@
     {
       "code": 6000,
       "name": "UnauthorizedCustody",
-      "msg": "Unauthorized: signer is not the FID custody address"
+      "msg": "Unauthorized: signer is not the TID custody address"
     },
     {
       "code": 6001,
@@ -347,7 +347,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -374,9 +374,9 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "docs": [
-              "The FID this key belongs to."
+              "The TID this key belongs to."
             ],
             "type": "u64"
           },
@@ -390,7 +390,7 @@
           {
             "name": "scope",
             "docs": [
-              "Permission scope: 0=Full, 1=CastsOnly, 2=SocialOnly, 3=ReadOnly."
+              "Permission scope: 0=Full, 1=TweetsOnly, 2=SocialOnly, 3=ReadOnly."
             ],
             "type": "u8"
           },
@@ -428,7 +428,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -444,7 +444,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -463,15 +463,15 @@
       }
     },
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "docs": [
-        "FID record from the fid-registry program (read-only cross-program reference)."
+        "TID record from the tid-registry program (read-only cross-program reference)."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {

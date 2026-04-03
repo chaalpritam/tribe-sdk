@@ -5,7 +5,7 @@ import usernameIdl from "../idl/username_registry.json";
 
 export interface UsernameRecord {
   username: string;
-  fid: bigint;
+  tid: bigint;
   registeredAt: number;
   expiry: number;
 }
@@ -21,27 +21,27 @@ export class UsernameClient {
   }
 
   /**
-   * Register a username for an FID.
+   * Register a username for a TID.
    */
-  async register(fid: bigint, username: string): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+  async register(tid: bigint, username: string): Promise<TransactionSignature> {
+    const tidRecord = this.deriveTidRecord(tid);
 
     const [usernameRecord] = PublicKey.findProgramAddressSync(
       [Buffer.from("username"), Buffer.from(username)],
       this.config.programIds.usernameRegistry
     );
 
-    const [fidUsername] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid_username"), this.fidToBuffer(fid)],
+    const [tidUsername] = PublicKey.findProgramAddressSync(
+      [Buffer.from("tid_username"), this.tidToBuffer(tid)],
       this.config.programIds.usernameRegistry
     );
 
     return this.program.methods
       .registerUsername(username)
       .accounts({
-        fidRecord,
+        tidRecord,
         usernameRecord,
-        fidUsername,
+        tidUsername,
         custody: this.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       })
@@ -51,8 +51,8 @@ export class UsernameClient {
   /**
    * Renew a username (extend expiry by 1 year).
    */
-  async renew(fid: bigint, username: string): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+  async renew(tid: bigint, username: string): Promise<TransactionSignature> {
+    const tidRecord = this.deriveTidRecord(tid);
 
     const [usernameRecord] = PublicKey.findProgramAddressSync(
       [Buffer.from("username"), Buffer.from(username)],
@@ -62,7 +62,7 @@ export class UsernameClient {
     return this.program.methods
       .renewUsername()
       .accounts({
-        fidRecord,
+        tidRecord,
         usernameRecord,
         custody: this.provider.wallet.publicKey,
       })
@@ -70,14 +70,14 @@ export class UsernameClient {
   }
 
   /**
-   * Transfer a username to a different FID.
+   * Transfer a username to a different TID.
    */
-  async transfer(username: string, newFid: bigint): Promise<TransactionSignature> {
-    // Fetch current owner's FID from the username record
+  async transfer(username: string, newTid: bigint): Promise<TransactionSignature> {
+    // Fetch current owner's TID from the username record
     const record = await this.getUsername(username);
     if (!record) throw new Error(`Username "${username}" not found`);
 
-    const fidRecord = this.deriveFidRecord(record.fid);
+    const tidRecord = this.deriveTidRecord(record.tid);
 
     const [usernameRecord] = PublicKey.findProgramAddressSync(
       [Buffer.from("username"), Buffer.from(username)],
@@ -85,9 +85,9 @@ export class UsernameClient {
     );
 
     return this.program.methods
-      .transferUsername(new BN(newFid.toString()))
+      .transferUsername(new BN(newTid.toString()))
       .accounts({
-        fidRecord,
+        tidRecord,
         usernameRecord,
         custody: this.provider.wallet.publicKey,
       })
@@ -97,25 +97,25 @@ export class UsernameClient {
   /**
    * Release a username (close account, reclaim rent).
    */
-  async release(fid: bigint, username: string): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+  async release(tid: bigint, username: string): Promise<TransactionSignature> {
+    const tidRecord = this.deriveTidRecord(tid);
 
     const [usernameRecord] = PublicKey.findProgramAddressSync(
       [Buffer.from("username"), Buffer.from(username)],
       this.config.programIds.usernameRegistry
     );
 
-    const [fidUsername] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid_username"), this.fidToBuffer(fid)],
+    const [tidUsername] = PublicKey.findProgramAddressSync(
+      [Buffer.from("tid_username"), this.tidToBuffer(tid)],
       this.config.programIds.usernameRegistry
     );
 
     return this.program.methods
       .releaseUsername()
       .accounts({
-        fidRecord,
+        tidRecord,
         usernameRecord,
-        fidUsername,
+        tidUsername,
         custody: this.provider.wallet.publicKey,
       })
       .rpc();
@@ -140,7 +140,7 @@ export class UsernameClient {
 
       return {
         username: decodedUsername,
-        fid: BigInt(data.fid.toString()),
+        tid: BigInt(data.tid.toString()),
         registeredAt: (data.registeredAt as BN).toNumber(),
         expiry: (data.expiry as BN).toNumber(),
       };
@@ -149,17 +149,17 @@ export class UsernameClient {
     }
   }
 
-  private deriveFidRecord(fid: bigint): PublicKey {
+  private deriveTidRecord(tid: bigint): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), this.fidToBuffer(fid)],
-      this.config.programIds.fidRegistry
+      [Buffer.from("tid"), this.tidToBuffer(tid)],
+      this.config.programIds.tidRegistry
     );
     return pda;
   }
 
-  private fidToBuffer(fid: bigint): Buffer {
+  private tidToBuffer(tid: bigint): Buffer {
     const buf = Buffer.alloc(8);
-    buf.writeBigUInt64LE(fid);
+    buf.writeBigUInt64LE(tid);
     return buf;
   }
 }

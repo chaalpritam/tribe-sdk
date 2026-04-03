@@ -24,9 +24,9 @@
       ],
       "accounts": [
         {
-          "name": "follower_fid_record",
+          "name": "follower_tid_record",
           "docs": [
-            "Follower's FID record — proves custody ownership."
+            "Follower's TID record — proves custody ownership."
           ]
         },
         {
@@ -58,8 +58,8 @@
               },
               {
                 "kind": "account",
-                "path": "follower_fid_record.fid",
-                "account": "FidRecord"
+                "path": "follower_tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -93,7 +93,7 @@
               },
               {
                 "kind": "account",
-                "path": "following_profile.fid",
+                "path": "following_profile.tid",
                 "account": "SocialProfile"
               }
             ]
@@ -118,12 +118,12 @@
               },
               {
                 "kind": "account",
-                "path": "follower_fid_record.fid",
-                "account": "FidRecord"
+                "path": "follower_tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "account",
-                "path": "following_profile.fid",
+                "path": "following_profile.tid",
                 "account": "SocialProfile"
               }
             ]
@@ -144,7 +144,7 @@
     {
       "name": "init_profile",
       "docs": [
-        "Initialize a social profile for an FID (once per user)."
+        "Initialize a social profile for a TID (once per user)."
       ],
       "discriminator": [
         210,
@@ -158,7 +158,7 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "social_profile",
@@ -186,8 +186,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -221,9 +221,9 @@
       ],
       "accounts": [
         {
-          "name": "follower_fid_record",
+          "name": "follower_tid_record",
           "docs": [
-            "Follower's FID record — proves custody ownership."
+            "Follower's TID record — proves custody ownership."
           ]
         },
         {
@@ -255,8 +255,8 @@
               },
               {
                 "kind": "account",
-                "path": "follower_fid_record.fid",
-                "account": "FidRecord"
+                "path": "follower_tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -290,7 +290,7 @@
               },
               {
                 "kind": "account",
-                "path": "following_profile.fid",
+                "path": "following_profile.tid",
                 "account": "SocialProfile"
               }
             ]
@@ -315,12 +315,12 @@
               },
               {
                 "kind": "account",
-                "path": "follower_fid_record.fid",
-                "account": "FidRecord"
+                "path": "follower_tid_record.tid",
+                "account": "TidRecord"
               },
               {
                 "kind": "account",
-                "path": "following_profile.fid",
+                "path": "following_profile.tid",
                 "account": "SocialProfile"
               }
             ]
@@ -337,7 +337,7 @@
   ],
   "accounts": [
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "discriminator": [
         49,
         19,
@@ -421,7 +421,7 @@
     {
       "code": 6000,
       "name": "UnauthorizedCustody",
-      "msg": "Unauthorized: signer is not the FID custody address"
+      "msg": "Unauthorized: signer is not the TID custody address"
     },
     {
       "code": 6001,
@@ -436,15 +436,15 @@
   ],
   "types": [
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "docs": [
-        "FID record from fid-registry (cross-program read)."
+        "TID record from tid-registry (cross-program read)."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -472,11 +472,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "follower_fid",
+            "name": "follower_tid",
             "type": "u64"
           },
           {
-            "name": "following_fid",
+            "name": "following_tid",
             "type": "u64"
           }
         ]
@@ -496,11 +496,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "follower_fid",
+            "name": "follower_tid",
             "type": "u64"
           },
           {
-            "name": "following_fid",
+            "name": "following_tid",
             "type": "u64"
           },
           {
@@ -520,7 +520,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           }
         ]
@@ -529,13 +529,13 @@
     {
       "name": "SocialProfile",
       "docs": [
-        "Social profile — stores only counters. One per FID."
+        "Social profile — stores only counters. One per TID."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -559,11 +559,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "follower_fid",
+            "name": "follower_tid",
             "type": "u64"
           },
           {
-            "name": "following_fid",
+            "name": "following_tid",
             "type": "u64"
           }
         ]

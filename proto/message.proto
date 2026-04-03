@@ -11,18 +11,18 @@ message TribeMessage {
 
 message MessageData {
   MessageType type        = 1;
-  uint64 fid              = 2;
+  uint64 tid              = 2;
   uint32 timestamp        = 3;  // unix seconds
   Network network         = 4;
   oneof body {
-    CastAddBody cast_add          = 5;
-    CastRemoveBody cast_remove    = 6;
+    TweetAddBody tweet_add          = 5;
+    TweetRemoveBody tweet_remove    = 6;
     ReactionBody reaction         = 7;
     UserDataBody user_data        = 8;
   }
 }
 
-message CastAddBody {
+message TweetAddBody {
   string text             = 1;  // max 320 chars
   repeated uint64 mentions = 2;
   repeated string embeds  = 3;
@@ -30,7 +30,7 @@ message CastAddBody {
   string channel_id       = 5;
 }
 
-message CastRemoveBody {
+message TweetRemoveBody {
   bytes target_hash       = 1;
 }
 
@@ -46,8 +46,8 @@ message UserDataBody {
 
 enum MessageType {
   MESSAGE_TYPE_NONE       = 0;
-  CAST_ADD                = 1;
-  CAST_REMOVE             = 2;
+  TWEET_ADD               = 1;
+  TWEET_REMOVE            = 2;
   REACTION_ADD            = 3;
   REACTION_REMOVE         = 4;
   LINK_ADD                = 5;

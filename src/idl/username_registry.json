@@ -10,7 +10,7 @@
     {
       "name": "register_username",
       "docs": [
-        "Register a username for an FID."
+        "Register a username for a TID."
       ],
       "discriminator": [
         134,
@@ -24,7 +24,7 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "username_record",
@@ -52,14 +52,14 @@
           }
         },
         {
-          "name": "fid_username",
+          "name": "tid_username",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  102,
+                  116,
                   105,
                   100,
                   95,
@@ -75,8 +75,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -115,21 +115,21 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "username_record",
           "writable": true
         },
         {
-          "name": "fid_username",
+          "name": "tid_username",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  102,
+                  116,
                   105,
                   100,
                   95,
@@ -145,8 +145,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -176,7 +176,7 @@
       ],
       "accounts": [
         {
-          "name": "fid_record"
+          "name": "tid_record"
         },
         {
           "name": "username_record",
@@ -192,7 +192,7 @@
     {
       "name": "transfer_username",
       "docs": [
-        "Transfer a username to a different FID."
+        "Transfer a username to a different TID."
       ],
       "discriminator": [
         249,
@@ -206,9 +206,9 @@
       ],
       "accounts": [
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "docs": [
-            "Current owner's FID record."
+            "Current owner's TID record."
           ]
         },
         {
@@ -222,7 +222,7 @@
       ],
       "args": [
         {
-          "name": "new_fid",
+          "name": "new_tid",
           "type": "u64"
         }
       ]
@@ -230,7 +230,7 @@
   ],
   "accounts": [
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "discriminator": [
         49,
         19,
@@ -243,7 +243,7 @@
       ]
     },
     {
-      "name": "FidUsername",
+      "name": "TidUsername",
       "discriminator": [
         109,
         89,
@@ -327,7 +327,7 @@
     {
       "code": 6000,
       "name": "UnauthorizedCustody",
-      "msg": "Unauthorized: signer is not the FID custody address"
+      "msg": "Unauthorized: signer is not the TID custody address"
     },
     {
       "code": 6001,
@@ -357,15 +357,15 @@
   ],
   "types": [
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "docs": [
-        "FID record from fid-registry (cross-program read)."
+        "TID record from tid-registry (cross-program read)."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -388,9 +388,9 @@
       }
     },
     {
-      "name": "FidUsername",
+      "name": "TidUsername",
       "docs": [
-        "Reverse lookup: FID → username hash."
+        "Reverse lookup: TID → username hash."
       ],
       "type": {
         "kind": "struct",
@@ -414,7 +414,7 @@
     {
       "name": "UsernameRecord",
       "docs": [
-        "Username record — human-readable name bound to an FID."
+        "Username record — human-readable name bound to a TID."
       ],
       "type": {
         "kind": "struct",
@@ -439,9 +439,9 @@
             "type": "u8"
           },
           {
-            "name": "fid",
+            "name": "tid",
             "docs": [
-              "The FID this username is bound to."
+              "The TID this username is bound to."
             ],
             "type": "u64"
           },
@@ -476,7 +476,7 @@
             "type": "string"
           },
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -496,7 +496,7 @@
             "type": "string"
           },
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           }
         ]
@@ -512,7 +512,7 @@
             "type": "string"
           },
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -532,11 +532,11 @@
             "type": "string"
           },
           {
-            "name": "old_fid",
+            "name": "old_tid",
             "type": "u64"
           },
           {
-            "name": "new_fid",
+            "name": "new_tid",
             "type": "u64"
           }
         ]

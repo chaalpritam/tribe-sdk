@@ -1,8 +1,8 @@
 export const PROTOCOL_VERSION = 1;
 
 export enum MessageType {
-  CAST_ADD = 1,
-  CAST_REMOVE = 2,
+  TWEET_ADD = 1,
+  TWEET_REMOVE = 2,
   REACTION_ADD = 3,
   REACTION_REMOVE = 4,
   LINK_ADD = 5,
@@ -24,7 +24,7 @@ export enum Network {
   DEVNET = 2,
 }
 
-export interface CastAddBody {
+export interface TweetAddBody {
   text: string;
   mentions: bigint[];
   embeds: string[];
@@ -32,7 +32,7 @@ export interface CastAddBody {
   channelId?: string;
 }
 
-export interface CastRemoveBody {
+export interface TweetRemoveBody {
   targetHash: Uint8Array;
 }
 
@@ -46,11 +46,11 @@ export interface UserDataBody {
   value: string;
 }
 
-export type MessageBody = CastAddBody | CastRemoveBody | ReactionBody | UserDataBody;
+export type MessageBody = TweetAddBody | TweetRemoveBody | ReactionBody | UserDataBody;
 
 export interface MessageData {
   type: MessageType;
-  fid: bigint;
+  tid: bigint;
   timestamp: number;
   network: Network;
   body: MessageBody;

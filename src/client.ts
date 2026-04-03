@@ -5,11 +5,11 @@ import { MAINNET_CONFIG } from "./network/mainnet";
 import { LOCALNET_CONFIG } from "./network/localnet";
 import { ExecutionProvider } from "./execution/types";
 import { DirectSolanaProvider } from "./execution/direct-solana";
-import { FidClient } from "./identity/fid";
+import { TidClient } from "./identity/tid";
 import { AppKeyClient } from "./identity/app-keys";
 import { UsernameClient } from "./identity/usernames";
 import { GraphClient } from "./social/graph";
-import { CastClient } from "./social/casts";
+import { TweetClient } from "./social/tweets";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -22,18 +22,18 @@ export interface TribeClientOptions {
  * Usage:
  *   const tribe = TribeClient.forDevnet(provider);
  *   await tribe.identity.register(recoveryAddress);
- *   await tribe.social.follow(myFid, targetFid);
- *   await tribe.casts.publish(myFid, "Hello Tribe!", signingKey);
+ *   await tribe.social.follow(myTid, targetTid);
+ *   await tribe.tweets.publish(myTid, "Hello Tribe!", signingKey);
  */
 export class TribeClient {
   public readonly config: NetworkConfig;
   public readonly identity: {
-    fid: FidClient;
+    tid: TidClient;
     appKeys: AppKeyClient;
     usernames: UsernameClient;
   };
   public readonly social: GraphClient;
-  public readonly casts: CastClient;
+  public readonly tweets: TweetClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -44,7 +44,7 @@ export class TribeClient {
 
     // Identity modules (always talk directly to Solana).
     this.identity = {
-      fid: new FidClient(provider, config),
+      tid: new TidClient(provider, config),
       appKeys: new AppKeyClient(provider, config),
       usernames: new UsernameClient(provider, config),
     };
@@ -53,8 +53,8 @@ export class TribeClient {
     const execution = options?.execution ?? new DirectSolanaProvider(provider, config);
     this.social = new GraphClient(execution);
 
-    // Casts — always talk to cast server.
-    this.casts = new CastClient(config);
+    // Tweets — always talk to tweet server.
+    this.tweets = new TweetClient(config);
   }
 
   /** Connect to Solana devnet. */

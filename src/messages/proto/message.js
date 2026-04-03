@@ -355,11 +355,11 @@ $root.tribe = (function() {
          * @memberof tribe
          * @interface IMessageData
          * @property {tribe.MessageType|null} [type] MessageData type
-         * @property {number|Long|null} [fid] MessageData fid
+         * @property {number|Long|null} [tid] MessageData tid
          * @property {number|null} [timestamp] MessageData timestamp
          * @property {tribe.Network|null} [network] MessageData network
-         * @property {tribe.ICastAddBody|null} [castAdd] MessageData castAdd
-         * @property {tribe.ICastRemoveBody|null} [castRemove] MessageData castRemove
+         * @property {tribe.ITweetAddBody|null} [tweetAdd] MessageData tweetAdd
+         * @property {tribe.ITweetRemoveBody|null} [tweetRemove] MessageData tweetRemove
          * @property {tribe.IReactionBody|null} [reaction] MessageData reaction
          * @property {tribe.IUserDataBody|null} [userData] MessageData userData
          */
@@ -388,12 +388,12 @@ $root.tribe = (function() {
         MessageData.prototype.type = 0;
 
         /**
-         * MessageData fid.
-         * @member {number|Long} fid
+         * MessageData tid.
+         * @member {number|Long} tid
          * @memberof tribe.MessageData
          * @instance
          */
-        MessageData.prototype.fid = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+        MessageData.prototype.tid = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
         /**
          * MessageData timestamp.
@@ -412,20 +412,20 @@ $root.tribe = (function() {
         MessageData.prototype.network = 0;
 
         /**
-         * MessageData castAdd.
-         * @member {tribe.ICastAddBody|null|undefined} castAdd
+         * MessageData tweetAdd.
+         * @member {tribe.ITweetAddBody|null|undefined} tweetAdd
          * @memberof tribe.MessageData
          * @instance
          */
-        MessageData.prototype.castAdd = null;
+        MessageData.prototype.tweetAdd = null;
 
         /**
-         * MessageData castRemove.
-         * @member {tribe.ICastRemoveBody|null|undefined} castRemove
+         * MessageData tweetRemove.
+         * @member {tribe.ITweetRemoveBody|null|undefined} tweetRemove
          * @memberof tribe.MessageData
          * @instance
          */
-        MessageData.prototype.castRemove = null;
+        MessageData.prototype.tweetRemove = null;
 
         /**
          * MessageData reaction.
@@ -448,12 +448,12 @@ $root.tribe = (function() {
 
         /**
          * MessageData body.
-         * @member {"castAdd"|"castRemove"|"reaction"|"userData"|undefined} body
+         * @member {"tweetAdd"|"tweetRemove"|"reaction"|"userData"|undefined} body
          * @memberof tribe.MessageData
          * @instance
          */
         Object.defineProperty(MessageData.prototype, "body", {
-            get: $util.oneOfGetter($oneOfFields = ["castAdd", "castRemove", "reaction", "userData"]),
+            get: $util.oneOfGetter($oneOfFields = ["tweetAdd", "tweetRemove", "reaction", "userData"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -483,16 +483,16 @@ $root.tribe = (function() {
                 writer = $Writer.create();
             if (message.type != null && Object.hasOwnProperty.call(message, "type"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
-            if (message.fid != null && Object.hasOwnProperty.call(message, "fid"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.fid);
+            if (message.tid != null && Object.hasOwnProperty.call(message, "tid"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.tid);
             if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.timestamp);
             if (message.network != null && Object.hasOwnProperty.call(message, "network"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.network);
-            if (message.castAdd != null && Object.hasOwnProperty.call(message, "castAdd"))
-                $root.tribe.CastAddBody.encode(message.castAdd, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-            if (message.castRemove != null && Object.hasOwnProperty.call(message, "castRemove"))
-                $root.tribe.CastRemoveBody.encode(message.castRemove, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+            if (message.tweetAdd != null && Object.hasOwnProperty.call(message, "tweetAdd"))
+                $root.tribe.TweetAddBody.encode(message.tweetAdd, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.tweetRemove != null && Object.hasOwnProperty.call(message, "tweetRemove"))
+                $root.tribe.TweetRemoveBody.encode(message.tweetRemove, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
             if (message.reaction != null && Object.hasOwnProperty.call(message, "reaction"))
                 $root.tribe.ReactionBody.encode(message.reaction, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
             if (message.userData != null && Object.hasOwnProperty.call(message, "userData"))
@@ -538,7 +538,7 @@ $root.tribe = (function() {
                         break;
                     }
                 case 2: {
-                        message.fid = reader.uint64();
+                        message.tid = reader.uint64();
                         break;
                     }
                 case 3: {
@@ -550,11 +550,11 @@ $root.tribe = (function() {
                         break;
                     }
                 case 5: {
-                        message.castAdd = $root.tribe.CastAddBody.decode(reader, reader.uint32());
+                        message.tweetAdd = $root.tribe.TweetAddBody.decode(reader, reader.uint32());
                         break;
                     }
                 case 6: {
-                        message.castRemove = $root.tribe.CastRemoveBody.decode(reader, reader.uint32());
+                        message.tweetRemove = $root.tribe.TweetRemoveBody.decode(reader, reader.uint32());
                         break;
                     }
                 case 7: {
@@ -619,9 +619,9 @@ $root.tribe = (function() {
                 case 11:
                     break;
                 }
-            if (message.fid != null && message.hasOwnProperty("fid"))
-                if (!$util.isInteger(message.fid) && !(message.fid && $util.isInteger(message.fid.low) && $util.isInteger(message.fid.high)))
-                    return "fid: integer|Long expected";
+            if (message.tid != null && message.hasOwnProperty("tid"))
+                if (!$util.isInteger(message.tid) && !(message.tid && $util.isInteger(message.tid.low) && $util.isInteger(message.tid.high)))
+                    return "tid: integer|Long expected";
             if (message.timestamp != null && message.hasOwnProperty("timestamp"))
                 if (!$util.isInteger(message.timestamp))
                     return "timestamp: integer expected";
@@ -634,22 +634,22 @@ $root.tribe = (function() {
                 case 2:
                     break;
                 }
-            if (message.castAdd != null && message.hasOwnProperty("castAdd")) {
+            if (message.tweetAdd != null && message.hasOwnProperty("tweetAdd")) {
                 properties.body = 1;
                 {
-                    var error = $root.tribe.CastAddBody.verify(message.castAdd);
+                    var error = $root.tribe.TweetAddBody.verify(message.tweetAdd);
                     if (error)
-                        return "castAdd." + error;
+                        return "tweetAdd." + error;
                 }
             }
-            if (message.castRemove != null && message.hasOwnProperty("castRemove")) {
+            if (message.tweetRemove != null && message.hasOwnProperty("tweetRemove")) {
                 if (properties.body === 1)
                     return "body: multiple values";
                 properties.body = 1;
                 {
-                    var error = $root.tribe.CastRemoveBody.verify(message.castRemove);
+                    var error = $root.tribe.TweetRemoveBody.verify(message.tweetRemove);
                     if (error)
-                        return "castRemove." + error;
+                        return "tweetRemove." + error;
                 }
             }
             if (message.reaction != null && message.hasOwnProperty("reaction")) {
@@ -698,11 +698,11 @@ $root.tribe = (function() {
             case 0:
                 message.type = 0;
                 break;
-            case "CAST_ADD":
+            case "TWEET_ADD":
             case 1:
                 message.type = 1;
                 break;
-            case "CAST_REMOVE":
+            case "TWEET_REMOVE":
             case 2:
                 message.type = 2;
                 break;
@@ -743,15 +743,15 @@ $root.tribe = (function() {
                 message.type = 11;
                 break;
             }
-            if (object.fid != null)
+            if (object.tid != null)
                 if ($util.Long)
-                    (message.fid = $util.Long.fromValue(object.fid)).unsigned = true;
-                else if (typeof object.fid === "string")
-                    message.fid = parseInt(object.fid, 10);
-                else if (typeof object.fid === "number")
-                    message.fid = object.fid;
-                else if (typeof object.fid === "object")
-                    message.fid = new $util.LongBits(object.fid.low >>> 0, object.fid.high >>> 0).toNumber(true);
+                    (message.tid = $util.Long.fromValue(object.tid)).unsigned = true;
+                else if (typeof object.tid === "string")
+                    message.tid = parseInt(object.tid, 10);
+                else if (typeof object.tid === "number")
+                    message.tid = object.tid;
+                else if (typeof object.tid === "object")
+                    message.tid = new $util.LongBits(object.tid.low >>> 0, object.tid.high >>> 0).toNumber(true);
             if (object.timestamp != null)
                 message.timestamp = object.timestamp >>> 0;
             switch (object.network) {
@@ -774,15 +774,15 @@ $root.tribe = (function() {
                 message.network = 2;
                 break;
             }
-            if (object.castAdd != null) {
-                if (typeof object.castAdd !== "object")
-                    throw TypeError(".tribe.MessageData.castAdd: object expected");
-                message.castAdd = $root.tribe.CastAddBody.fromObject(object.castAdd);
+            if (object.tweetAdd != null) {
+                if (typeof object.tweetAdd !== "object")
+                    throw TypeError(".tribe.MessageData.tweetAdd: object expected");
+                message.tweetAdd = $root.tribe.TweetAddBody.fromObject(object.tweetAdd);
             }
-            if (object.castRemove != null) {
-                if (typeof object.castRemove !== "object")
-                    throw TypeError(".tribe.MessageData.castRemove: object expected");
-                message.castRemove = $root.tribe.CastRemoveBody.fromObject(object.castRemove);
+            if (object.tweetRemove != null) {
+                if (typeof object.tweetRemove !== "object")
+                    throw TypeError(".tribe.MessageData.tweetRemove: object expected");
+                message.tweetRemove = $root.tribe.TweetRemoveBody.fromObject(object.tweetRemove);
             }
             if (object.reaction != null) {
                 if (typeof object.reaction !== "object")
@@ -814,32 +814,32 @@ $root.tribe = (function() {
                 object.type = options.enums === String ? "MESSAGE_TYPE_NONE" : 0;
                 if ($util.Long) {
                     var long = new $util.Long(0, 0, true);
-                    object.fid = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                    object.tid = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
-                    object.fid = options.longs === String ? "0" : 0;
+                    object.tid = options.longs === String ? "0" : 0;
                 object.timestamp = 0;
                 object.network = options.enums === String ? "NETWORK_NONE" : 0;
             }
             if (message.type != null && message.hasOwnProperty("type"))
                 object.type = options.enums === String ? $root.tribe.MessageType[message.type] === undefined ? message.type : $root.tribe.MessageType[message.type] : message.type;
-            if (message.fid != null && message.hasOwnProperty("fid"))
-                if (typeof message.fid === "number")
-                    object.fid = options.longs === String ? String(message.fid) : message.fid;
+            if (message.tid != null && message.hasOwnProperty("tid"))
+                if (typeof message.tid === "number")
+                    object.tid = options.longs === String ? String(message.tid) : message.tid;
                 else
-                    object.fid = options.longs === String ? $util.Long.prototype.toString.call(message.fid) : options.longs === Number ? new $util.LongBits(message.fid.low >>> 0, message.fid.high >>> 0).toNumber(true) : message.fid;
+                    object.tid = options.longs === String ? $util.Long.prototype.toString.call(message.tid) : options.longs === Number ? new $util.LongBits(message.tid.low >>> 0, message.tid.high >>> 0).toNumber(true) : message.tid;
             if (message.timestamp != null && message.hasOwnProperty("timestamp"))
                 object.timestamp = message.timestamp;
             if (message.network != null && message.hasOwnProperty("network"))
                 object.network = options.enums === String ? $root.tribe.Network[message.network] === undefined ? message.network : $root.tribe.Network[message.network] : message.network;
-            if (message.castAdd != null && message.hasOwnProperty("castAdd")) {
-                object.castAdd = $root.tribe.CastAddBody.toObject(message.castAdd, options);
+            if (message.tweetAdd != null && message.hasOwnProperty("tweetAdd")) {
+                object.tweetAdd = $root.tribe.TweetAddBody.toObject(message.tweetAdd, options);
                 if (options.oneofs)
-                    object.body = "castAdd";
+                    object.body = "tweetAdd";
             }
-            if (message.castRemove != null && message.hasOwnProperty("castRemove")) {
-                object.castRemove = $root.tribe.CastRemoveBody.toObject(message.castRemove, options);
+            if (message.tweetRemove != null && message.hasOwnProperty("tweetRemove")) {
+                object.tweetRemove = $root.tribe.TweetRemoveBody.toObject(message.tweetRemove, options);
                 if (options.oneofs)
-                    object.body = "castRemove";
+                    object.body = "tweetRemove";
             }
             if (message.reaction != null && message.hasOwnProperty("reaction")) {
                 object.reaction = $root.tribe.ReactionBody.toObject(message.reaction, options);
@@ -883,28 +883,28 @@ $root.tribe = (function() {
         return MessageData;
     })();
 
-    tribe.CastAddBody = (function() {
+    tribe.TweetAddBody = (function() {
 
         /**
-         * Properties of a CastAddBody.
+         * Properties of a TweetAddBody.
          * @memberof tribe
-         * @interface ICastAddBody
-         * @property {string|null} [text] CastAddBody text
-         * @property {Array.<number|Long>|null} [mentions] CastAddBody mentions
-         * @property {Array.<string>|null} [embeds] CastAddBody embeds
-         * @property {Uint8Array|null} [parentHash] CastAddBody parentHash
-         * @property {string|null} [channelId] CastAddBody channelId
+         * @interface ITweetAddBody
+         * @property {string|null} [text] TweetAddBody text
+         * @property {Array.<number|Long>|null} [mentions] TweetAddBody mentions
+         * @property {Array.<string>|null} [embeds] TweetAddBody embeds
+         * @property {Uint8Array|null} [parentHash] TweetAddBody parentHash
+         * @property {string|null} [channelId] TweetAddBody channelId
          */
 
         /**
-         * Constructs a new CastAddBody.
+         * Constructs a new TweetAddBody.
          * @memberof tribe
-         * @classdesc Represents a CastAddBody.
-         * @implements ICastAddBody
+         * @classdesc Represents a TweetAddBody.
+         * @implements ITweetAddBody
          * @constructor
-         * @param {tribe.ICastAddBody=} [properties] Properties to set
+         * @param {tribe.ITweetAddBody=} [properties] Properties to set
          */
-        function CastAddBody(properties) {
+        function TweetAddBody(properties) {
             this.mentions = [];
             this.embeds = [];
             if (properties)
@@ -914,67 +914,67 @@ $root.tribe = (function() {
         }
 
         /**
-         * CastAddBody text.
+         * TweetAddBody text.
          * @member {string} text
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          */
-        CastAddBody.prototype.text = "";
+        TweetAddBody.prototype.text = "";
 
         /**
-         * CastAddBody mentions.
+         * TweetAddBody mentions.
          * @member {Array.<number|Long>} mentions
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          */
-        CastAddBody.prototype.mentions = $util.emptyArray;
+        TweetAddBody.prototype.mentions = $util.emptyArray;
 
         /**
-         * CastAddBody embeds.
+         * TweetAddBody embeds.
          * @member {Array.<string>} embeds
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          */
-        CastAddBody.prototype.embeds = $util.emptyArray;
+        TweetAddBody.prototype.embeds = $util.emptyArray;
 
         /**
-         * CastAddBody parentHash.
+         * TweetAddBody parentHash.
          * @member {Uint8Array} parentHash
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          */
-        CastAddBody.prototype.parentHash = $util.newBuffer([]);
+        TweetAddBody.prototype.parentHash = $util.newBuffer([]);
 
         /**
-         * CastAddBody channelId.
+         * TweetAddBody channelId.
          * @member {string} channelId
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          */
-        CastAddBody.prototype.channelId = "";
+        TweetAddBody.prototype.channelId = "";
 
         /**
-         * Creates a new CastAddBody instance using the specified properties.
+         * Creates a new TweetAddBody instance using the specified properties.
          * @function create
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
-         * @param {tribe.ICastAddBody=} [properties] Properties to set
-         * @returns {tribe.CastAddBody} CastAddBody instance
+         * @param {tribe.ITweetAddBody=} [properties] Properties to set
+         * @returns {tribe.TweetAddBody} TweetAddBody instance
          */
-        CastAddBody.create = function create(properties) {
-            return new CastAddBody(properties);
+        TweetAddBody.create = function create(properties) {
+            return new TweetAddBody(properties);
         };
 
         /**
-         * Encodes the specified CastAddBody message. Does not implicitly {@link tribe.CastAddBody.verify|verify} messages.
+         * Encodes the specified TweetAddBody message. Does not implicitly {@link tribe.TweetAddBody.verify|verify} messages.
          * @function encode
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
-         * @param {tribe.ICastAddBody} message CastAddBody message or plain object to encode
+         * @param {tribe.ITweetAddBody} message TweetAddBody message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        CastAddBody.encode = function encode(message, writer) {
+        TweetAddBody.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.text != null && Object.hasOwnProperty.call(message, "text"))
@@ -996,33 +996,33 @@ $root.tribe = (function() {
         };
 
         /**
-         * Encodes the specified CastAddBody message, length delimited. Does not implicitly {@link tribe.CastAddBody.verify|verify} messages.
+         * Encodes the specified TweetAddBody message, length delimited. Does not implicitly {@link tribe.TweetAddBody.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
-         * @param {tribe.ICastAddBody} message CastAddBody message or plain object to encode
+         * @param {tribe.ITweetAddBody} message TweetAddBody message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        CastAddBody.encodeDelimited = function encodeDelimited(message, writer) {
+        TweetAddBody.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a CastAddBody message from the specified reader or buffer.
+         * Decodes a TweetAddBody message from the specified reader or buffer.
          * @function decode
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {tribe.CastAddBody} CastAddBody
+         * @returns {tribe.TweetAddBody} TweetAddBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        CastAddBody.decode = function decode(reader, length, error) {
+        TweetAddBody.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tribe.CastAddBody();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tribe.TweetAddBody();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -1066,30 +1066,30 @@ $root.tribe = (function() {
         };
 
         /**
-         * Decodes a CastAddBody message from the specified reader or buffer, length delimited.
+         * Decodes a TweetAddBody message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {tribe.CastAddBody} CastAddBody
+         * @returns {tribe.TweetAddBody} TweetAddBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        CastAddBody.decodeDelimited = function decodeDelimited(reader) {
+        TweetAddBody.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a CastAddBody message.
+         * Verifies a TweetAddBody message.
          * @function verify
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        CastAddBody.verify = function verify(message) {
+        TweetAddBody.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.text != null && message.hasOwnProperty("text"))
@@ -1119,22 +1119,22 @@ $root.tribe = (function() {
         };
 
         /**
-         * Creates a CastAddBody message from a plain object. Also converts values to their respective internal types.
+         * Creates a TweetAddBody message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {tribe.CastAddBody} CastAddBody
+         * @returns {tribe.TweetAddBody} TweetAddBody
          */
-        CastAddBody.fromObject = function fromObject(object) {
-            if (object instanceof $root.tribe.CastAddBody)
+        TweetAddBody.fromObject = function fromObject(object) {
+            if (object instanceof $root.tribe.TweetAddBody)
                 return object;
-            var message = new $root.tribe.CastAddBody();
+            var message = new $root.tribe.TweetAddBody();
             if (object.text != null)
                 message.text = String(object.text);
             if (object.mentions) {
                 if (!Array.isArray(object.mentions))
-                    throw TypeError(".tribe.CastAddBody.mentions: array expected");
+                    throw TypeError(".tribe.TweetAddBody.mentions: array expected");
                 message.mentions = [];
                 for (var i = 0; i < object.mentions.length; ++i)
                     if ($util.Long)
@@ -1148,7 +1148,7 @@ $root.tribe = (function() {
             }
             if (object.embeds) {
                 if (!Array.isArray(object.embeds))
-                    throw TypeError(".tribe.CastAddBody.embeds: array expected");
+                    throw TypeError(".tribe.TweetAddBody.embeds: array expected");
                 message.embeds = [];
                 for (var i = 0; i < object.embeds.length; ++i)
                     message.embeds[i] = String(object.embeds[i]);
@@ -1164,15 +1164,15 @@ $root.tribe = (function() {
         };
 
         /**
-         * Creates a plain object from a CastAddBody message. Also converts values to other types if specified.
+         * Creates a plain object from a TweetAddBody message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
-         * @param {tribe.CastAddBody} message CastAddBody
+         * @param {tribe.TweetAddBody} message TweetAddBody
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        CastAddBody.toObject = function toObject(message, options) {
+        TweetAddBody.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -1214,52 +1214,52 @@ $root.tribe = (function() {
         };
 
         /**
-         * Converts this CastAddBody to JSON.
+         * Converts this TweetAddBody to JSON.
          * @function toJSON
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        CastAddBody.prototype.toJSON = function toJSON() {
+        TweetAddBody.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for CastAddBody
+         * Gets the default type url for TweetAddBody
          * @function getTypeUrl
-         * @memberof tribe.CastAddBody
+         * @memberof tribe.TweetAddBody
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        CastAddBody.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        TweetAddBody.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/tribe.CastAddBody";
+            return typeUrlPrefix + "/tribe.TweetAddBody";
         };
 
-        return CastAddBody;
+        return TweetAddBody;
     })();
 
-    tribe.CastRemoveBody = (function() {
+    tribe.TweetRemoveBody = (function() {
 
         /**
-         * Properties of a CastRemoveBody.
+         * Properties of a TweetRemoveBody.
          * @memberof tribe
-         * @interface ICastRemoveBody
-         * @property {Uint8Array|null} [targetHash] CastRemoveBody targetHash
+         * @interface ITweetRemoveBody
+         * @property {Uint8Array|null} [targetHash] TweetRemoveBody targetHash
          */
 
         /**
-         * Constructs a new CastRemoveBody.
+         * Constructs a new TweetRemoveBody.
          * @memberof tribe
-         * @classdesc Represents a CastRemoveBody.
-         * @implements ICastRemoveBody
+         * @classdesc Represents a TweetRemoveBody.
+         * @implements ITweetRemoveBody
          * @constructor
-         * @param {tribe.ICastRemoveBody=} [properties] Properties to set
+         * @param {tribe.ITweetRemoveBody=} [properties] Properties to set
          */
-        function CastRemoveBody(properties) {
+        function TweetRemoveBody(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -1267,35 +1267,35 @@ $root.tribe = (function() {
         }
 
         /**
-         * CastRemoveBody targetHash.
+         * TweetRemoveBody targetHash.
          * @member {Uint8Array} targetHash
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @instance
          */
-        CastRemoveBody.prototype.targetHash = $util.newBuffer([]);
+        TweetRemoveBody.prototype.targetHash = $util.newBuffer([]);
 
         /**
-         * Creates a new CastRemoveBody instance using the specified properties.
+         * Creates a new TweetRemoveBody instance using the specified properties.
          * @function create
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
-         * @param {tribe.ICastRemoveBody=} [properties] Properties to set
-         * @returns {tribe.CastRemoveBody} CastRemoveBody instance
+         * @param {tribe.ITweetRemoveBody=} [properties] Properties to set
+         * @returns {tribe.TweetRemoveBody} TweetRemoveBody instance
          */
-        CastRemoveBody.create = function create(properties) {
-            return new CastRemoveBody(properties);
+        TweetRemoveBody.create = function create(properties) {
+            return new TweetRemoveBody(properties);
         };
 
         /**
-         * Encodes the specified CastRemoveBody message. Does not implicitly {@link tribe.CastRemoveBody.verify|verify} messages.
+         * Encodes the specified TweetRemoveBody message. Does not implicitly {@link tribe.TweetRemoveBody.verify|verify} messages.
          * @function encode
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
-         * @param {tribe.ICastRemoveBody} message CastRemoveBody message or plain object to encode
+         * @param {tribe.ITweetRemoveBody} message TweetRemoveBody message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        CastRemoveBody.encode = function encode(message, writer) {
+        TweetRemoveBody.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.targetHash != null && Object.hasOwnProperty.call(message, "targetHash"))
@@ -1304,33 +1304,33 @@ $root.tribe = (function() {
         };
 
         /**
-         * Encodes the specified CastRemoveBody message, length delimited. Does not implicitly {@link tribe.CastRemoveBody.verify|verify} messages.
+         * Encodes the specified TweetRemoveBody message, length delimited. Does not implicitly {@link tribe.TweetRemoveBody.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
-         * @param {tribe.ICastRemoveBody} message CastRemoveBody message or plain object to encode
+         * @param {tribe.ITweetRemoveBody} message TweetRemoveBody message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        CastRemoveBody.encodeDelimited = function encodeDelimited(message, writer) {
+        TweetRemoveBody.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a CastRemoveBody message from the specified reader or buffer.
+         * Decodes a TweetRemoveBody message from the specified reader or buffer.
          * @function decode
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {tribe.CastRemoveBody} CastRemoveBody
+         * @returns {tribe.TweetRemoveBody} TweetRemoveBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        CastRemoveBody.decode = function decode(reader, length, error) {
+        TweetRemoveBody.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tribe.CastRemoveBody();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.tribe.TweetRemoveBody();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -1349,30 +1349,30 @@ $root.tribe = (function() {
         };
 
         /**
-         * Decodes a CastRemoveBody message from the specified reader or buffer, length delimited.
+         * Decodes a TweetRemoveBody message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {tribe.CastRemoveBody} CastRemoveBody
+         * @returns {tribe.TweetRemoveBody} TweetRemoveBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        CastRemoveBody.decodeDelimited = function decodeDelimited(reader) {
+        TweetRemoveBody.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a CastRemoveBody message.
+         * Verifies a TweetRemoveBody message.
          * @function verify
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        CastRemoveBody.verify = function verify(message) {
+        TweetRemoveBody.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.targetHash != null && message.hasOwnProperty("targetHash"))
@@ -1382,17 +1382,17 @@ $root.tribe = (function() {
         };
 
         /**
-         * Creates a CastRemoveBody message from a plain object. Also converts values to their respective internal types.
+         * Creates a TweetRemoveBody message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {tribe.CastRemoveBody} CastRemoveBody
+         * @returns {tribe.TweetRemoveBody} TweetRemoveBody
          */
-        CastRemoveBody.fromObject = function fromObject(object) {
-            if (object instanceof $root.tribe.CastRemoveBody)
+        TweetRemoveBody.fromObject = function fromObject(object) {
+            if (object instanceof $root.tribe.TweetRemoveBody)
                 return object;
-            var message = new $root.tribe.CastRemoveBody();
+            var message = new $root.tribe.TweetRemoveBody();
             if (object.targetHash != null)
                 if (typeof object.targetHash === "string")
                     $util.base64.decode(object.targetHash, message.targetHash = $util.newBuffer($util.base64.length(object.targetHash)), 0);
@@ -1402,15 +1402,15 @@ $root.tribe = (function() {
         };
 
         /**
-         * Creates a plain object from a CastRemoveBody message. Also converts values to other types if specified.
+         * Creates a plain object from a TweetRemoveBody message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
-         * @param {tribe.CastRemoveBody} message CastRemoveBody
+         * @param {tribe.TweetRemoveBody} message TweetRemoveBody
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        CastRemoveBody.toObject = function toObject(message, options) {
+        TweetRemoveBody.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -1428,32 +1428,32 @@ $root.tribe = (function() {
         };
 
         /**
-         * Converts this CastRemoveBody to JSON.
+         * Converts this TweetRemoveBody to JSON.
          * @function toJSON
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        CastRemoveBody.prototype.toJSON = function toJSON() {
+        TweetRemoveBody.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for CastRemoveBody
+         * Gets the default type url for TweetRemoveBody
          * @function getTypeUrl
-         * @memberof tribe.CastRemoveBody
+         * @memberof tribe.TweetRemoveBody
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        CastRemoveBody.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        TweetRemoveBody.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/tribe.CastRemoveBody";
+            return typeUrlPrefix + "/tribe.TweetRemoveBody";
         };
 
-        return CastRemoveBody;
+        return TweetRemoveBody;
     })();
 
     tribe.ReactionBody = (function() {
@@ -1952,8 +1952,8 @@ $root.tribe = (function() {
      * @name tribe.MessageType
      * @enum {number}
      * @property {number} MESSAGE_TYPE_NONE=0 MESSAGE_TYPE_NONE value
-     * @property {number} CAST_ADD=1 CAST_ADD value
-     * @property {number} CAST_REMOVE=2 CAST_REMOVE value
+     * @property {number} TWEET_ADD=1 TWEET_ADD value
+     * @property {number} TWEET_REMOVE=2 TWEET_REMOVE value
      * @property {number} REACTION_ADD=3 REACTION_ADD value
      * @property {number} REACTION_REMOVE=4 REACTION_REMOVE value
      * @property {number} LINK_ADD=5 LINK_ADD value
@@ -1967,8 +1967,8 @@ $root.tribe = (function() {
     tribe.MessageType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "MESSAGE_TYPE_NONE"] = 0;
-        values[valuesById[1] = "CAST_ADD"] = 1;
-        values[valuesById[2] = "CAST_REMOVE"] = 2;
+        values[valuesById[1] = "TWEET_ADD"] = 1;
+        values[valuesById[2] = "TWEET_REMOVE"] = 2;
         values[valuesById[3] = "REACTION_ADD"] = 3;
         values[valuesById[4] = "REACTION_REMOVE"] = 4;
         values[valuesById[5] = "LINK_ADD"] = 5;

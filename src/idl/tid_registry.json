@@ -1,10 +1,10 @@
 {
   "address": "4BSmJmRGQWKgioP9DG2bUuRS9U3V6soRauU7Nv6yGvHD",
   "metadata": {
-    "name": "fid_registry",
+    "name": "tid_registry",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Tribe Protocol — FID Registry Program"
+    "description": "Tribe Protocol — TID Registry Program"
   },
   "instructions": [
     {
@@ -24,22 +24,22 @@
       ],
       "accounts": [
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  102,
+                  116,
                   105,
                   100
                 ]
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -112,7 +112,7 @@
     {
       "name": "recover",
       "docs": [
-        "Recover FID using the recovery address."
+        "Recover TID using the recovery address."
       ],
       "discriminator": [
         108,
@@ -126,22 +126,22 @@
       ],
       "accounts": [
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  102,
+                  116,
                   105,
                   100
                 ]
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -168,8 +168,8 @@
               },
               {
                 "kind": "account",
-                "path": "fid_record.custody_address",
-                "account": "FidRecord"
+                "path": "tid_record.custody_address",
+                "account": "TidRecord"
               }
             ]
           }
@@ -224,7 +224,7 @@
     {
       "name": "register",
       "docs": [
-        "Register a new FID for the signer."
+        "Register a new TID for the signer."
       ],
       "discriminator": [
         211,
@@ -263,7 +263,7 @@
           }
         },
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "writable": true
         },
         {
@@ -310,7 +310,7 @@
     {
       "name": "transfer",
       "docs": [
-        "Transfer FID custody to a new wallet."
+        "Transfer TID custody to a new wallet."
       ],
       "discriminator": [
         163,
@@ -324,22 +324,22 @@
       ],
       "accounts": [
         {
-          "name": "fid_record",
+          "name": "tid_record",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  102,
+                  116,
                   105,
                   100
                 ]
               },
               {
                 "kind": "account",
-                "path": "fid_record.fid",
-                "account": "FidRecord"
+                "path": "tid_record.tid",
+                "account": "TidRecord"
               }
             ]
           }
@@ -434,7 +434,7 @@
       ]
     },
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "discriminator": [
         49,
         19,
@@ -462,7 +462,7 @@
   ],
   "events": [
     {
-      "name": "FidRecovered",
+      "name": "TidRecovered",
       "discriminator": [
         138,
         177,
@@ -475,7 +475,7 @@
       ]
     },
     {
-      "name": "FidRegistered",
+      "name": "TidRegistered",
       "discriminator": [
         174,
         78,
@@ -488,7 +488,7 @@
       ]
     },
     {
-      "name": "FidTransferred",
+      "name": "TidTransferred",
       "discriminator": [
         17,
         25,
@@ -540,13 +540,13 @@
     {
       "name": "CustodyLookup",
       "docs": [
-        "Reverse lookup: custody_address → fid."
+        "Reverse lookup: custody_address → tid."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -557,7 +557,7 @@
       }
     },
     {
-      "name": "FidRecord",
+      "name": "TidRecord",
       "docs": [
         "Core identity record — one per user."
       ],
@@ -565,7 +565,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "docs": [
               "Unique numeric identity (auto-incremented)."
             ],
@@ -574,14 +574,14 @@
           {
             "name": "custody_address",
             "docs": [
-              "Primary wallet that controls this FID."
+              "Primary wallet that controls this TID."
             ],
             "type": "pubkey"
           },
           {
             "name": "recovery_address",
             "docs": [
-              "Can reclaim FID if custody key is lost."
+              "Can reclaim TID if custody key is lost."
             ],
             "type": "pubkey"
           },
@@ -600,12 +600,12 @@
       }
     },
     {
-      "name": "FidRecovered",
+      "name": "TidRecovered",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -620,12 +620,12 @@
       }
     },
     {
-      "name": "FidRegistered",
+      "name": "TidRegistered",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -640,12 +640,12 @@
       }
     },
     {
-      "name": "FidTransferred",
+      "name": "TidTransferred",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {
@@ -665,9 +665,9 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid_counter",
+            "name": "tid_counter",
             "docs": [
-              "Auto-incrementing FID counter."
+              "Auto-incrementing TID counter."
             ],
             "type": "u64"
           },
@@ -691,7 +691,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "fid",
+            "name": "tid",
             "type": "u64"
           },
           {

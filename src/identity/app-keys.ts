@@ -5,13 +5,13 @@ import appKeyIdl from "../idl/app_key_registry.json";
 
 export enum AppKeyScope {
   Full = 0,
-  CastsOnly = 1,
+  TweetsOnly = 1,
   SocialOnly = 2,
   ReadOnly = 3,
 }
 
 export interface AppKeyRecord {
-  fid: bigint;
+  tid: bigint;
   appPubkey: PublicKey;
   scope: AppKeyScope;
   createdAt: number;
@@ -30,24 +30,24 @@ export class AppKeyClient {
   }
 
   /**
-   * Add an app key for an FID. Custody address must sign.
+   * Add an app key for a TID. Custody address must sign.
    */
   async addAppKey(
-    fid: bigint,
+    tid: bigint,
     appPubkey: PublicKey,
     scope: AppKeyScope,
     expiresAt: number = 0
   ): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+    const tidRecord = this.deriveTidRecord(tid);
     const [appKeyRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("app_key"), this.fidToBuffer(fid), appPubkey.toBuffer()],
+      [Buffer.from("app_key"), this.tidToBuffer(tid), appPubkey.toBuffer()],
       this.config.programIds.appKeyRegistry
     );
 
     return this.program.methods
       .addAppKey(appPubkey, scope, new BN(expiresAt))
       .accounts({
-        fidRecord,
+        tidRecord,
         appKeyRecord,
         custody: this.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
@@ -58,17 +58,17 @@ export class AppKeyClient {
   /**
    * Revoke an app key.
    */
-  async revokeAppKey(fid: bigint, appPubkey: PublicKey): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+  async revokeAppKey(tid: bigint, appPubkey: PublicKey): Promise<TransactionSignature> {
+    const tidRecord = this.deriveTidRecord(tid);
     const [appKeyRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("app_key"), this.fidToBuffer(fid), appPubkey.toBuffer()],
+      [Buffer.from("app_key"), this.tidToBuffer(tid), appPubkey.toBuffer()],
       this.config.programIds.appKeyRegistry
     );
 
     return this.program.methods
       .revokeAppKey()
       .accounts({
-        fidRecord,
+        tidRecord,
         appKeyRecord,
         custody: this.provider.wallet.publicKey,
       })
@@ -79,28 +79,28 @@ export class AppKeyClient {
    * Rotate an app key (revoke old + create new atomically).
    */
   async rotateAppKey(
-    fid: bigint,
+    tid: bigint,
     oldAppPubkey: PublicKey,
     newAppPubkey: PublicKey,
     scope: AppKeyScope,
     expiresAt: number = 0
   ): Promise<TransactionSignature> {
-    const fidRecord = this.deriveFidRecord(fid);
+    const tidRecord = this.deriveTidRecord(tid);
 
     const [oldAppKeyRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("app_key"), this.fidToBuffer(fid), oldAppPubkey.toBuffer()],
+      [Buffer.from("app_key"), this.tidToBuffer(tid), oldAppPubkey.toBuffer()],
       this.config.programIds.appKeyRegistry
     );
 
     const [newAppKeyRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("app_key"), this.fidToBuffer(fid), newAppPubkey.toBuffer()],
+      [Buffer.from("app_key"), this.tidToBuffer(tid), newAppPubkey.toBuffer()],
       this.config.programIds.appKeyRegistry
     );
 
     return this.program.methods
       .rotateAppKey(newAppPubkey, scope, new BN(expiresAt))
       .accounts({
-        fidRecord,
+        tidRecord,
         oldAppKeyRecord,
         newAppKeyRecord,
         custody: this.provider.wallet.publicKey,
@@ -112,9 +112,9 @@ export class AppKeyClient {
   /**
    * Fetch an app key record.
    */
-  async getAppKey(fid: bigint, appPubkey: PublicKey): Promise<AppKeyRecord | null> {
+  async getAppKey(tid: bigint, appPubkey: PublicKey): Promise<AppKeyRecord | null> {
     const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("app_key"), this.fidToBuffer(fid), appPubkey.toBuffer()],
+      [Buffer.from("app_key"), this.tidToBuffer(tid), appPubkey.toBuffer()],
       this.config.programIds.appKeyRegistry
     );
 
@@ -122,7 +122,7 @@ export class AppKeyClient {
       const account = await (this.program.account as any).appKeyRecord.fetch(pda);
       const data = account as any;
       return {
-        fid: BigInt(data.fid.toString()),
+        tid: BigInt(data.tid.toString()),
         appPubkey: data.appPubkey,
         scope: data.scope as AppKeyScope,
         createdAt: (data.createdAt as BN).toNumber(),
@@ -134,17 +134,17 @@ export class AppKeyClient {
     }
   }
 
-  private deriveFidRecord(fid: bigint): PublicKey {
+  private deriveTidRecord(tid: bigint): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), this.fidToBuffer(fid)],
-      this.config.programIds.fidRegistry
+      [Buffer.from("tid"), this.tidToBuffer(tid)],
+      this.config.programIds.tidRegistry
     );
     return pda;
   }
 
-  private fidToBuffer(fid: bigint): Buffer {
+  private tidToBuffer(tid: bigint): Buffer {
     const buf = Buffer.alloc(8);
-    buf.writeBigUInt64LE(fid);
+    buf.writeBigUInt64LE(tid);
     return buf;
   }
 }

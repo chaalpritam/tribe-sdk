@@ -19,19 +19,19 @@ const provider = AnchorProvider.env();
 const tribe = TribeClient.forDevnet(provider);
 
 // Register identity
-const { fid } = await tribe.identity.fid.register(recoveryAddress);
+const { tid } = await tribe.identity.tid.register(recoveryAddress);
 
 // Add an app key
-await tribe.identity.appKeys.addAppKey(fid, appPubkey, AppKeyScope.Full);
+await tribe.identity.appKeys.addAppKey(tid, appPubkey, AppKeyScope.Full);
 
 // Register a username
-await tribe.identity.usernames.register(fid, "alice");
+await tribe.identity.usernames.register(tid, "alice");
 
 // Follow someone
-await tribe.social.follow(myFid, targetFid);
+await tribe.social.follow(myTid, targetTid);
 
-// Publish a cast
-await tribe.casts.publish(myFid, "Hello Tribe!", signingKey);
+// Publish a tweet
+await tribe.tweets.publish(myTid, "Hello Tribe!", signingKey);
 ```
 
 ## Network Switching
@@ -66,16 +66,16 @@ const tribe = TribeClient.forDevnet(provider, {
 
 | Module | Description |
 |--------|-------------|
-| `tribe.identity.fid` | Register/transfer/recover FIDs |
+| `tribe.identity.tid` | Register/transfer/recover TIDs |
 | `tribe.identity.appKeys` | Add/revoke/rotate app keys |
 | `tribe.identity.usernames` | Register/renew/transfer usernames |
 | `tribe.social` | Follow/unfollow (via ExecutionProvider) |
-| `tribe.casts` | Publish/read casts (via cast server) |
+| `tribe.tweets` | Publish/read tweets (via tweet server) |
 
 ## Related Repos
 
 - [tribe-protocol](../tribe-protocol) — Solana programs (Anchor)
-- [tribe-cast-server](../tribe-cast-server) — Cast message server
+- [tribe-tweet-server](../tribe-tweet-server) — Tweet message server
 - [tribe-indexer](../tribe-indexer) — Event indexer + read API
 
 ## License

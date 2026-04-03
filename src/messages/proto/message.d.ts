@@ -130,8 +130,8 @@ export namespace tribe {
         /** MessageData type */
         type?: (tribe.MessageType|null);
 
-        /** MessageData fid */
-        fid?: (number|Long|null);
+        /** MessageData tid */
+        tid?: (number|Long|null);
 
         /** MessageData timestamp */
         timestamp?: (number|null);
@@ -139,11 +139,11 @@ export namespace tribe {
         /** MessageData network */
         network?: (tribe.Network|null);
 
-        /** MessageData castAdd */
-        castAdd?: (tribe.ICastAddBody|null);
+        /** MessageData tweetAdd */
+        tweetAdd?: (tribe.ITweetAddBody|null);
 
-        /** MessageData castRemove */
-        castRemove?: (tribe.ICastRemoveBody|null);
+        /** MessageData tweetRemove */
+        tweetRemove?: (tribe.ITweetRemoveBody|null);
 
         /** MessageData reaction */
         reaction?: (tribe.IReactionBody|null);
@@ -164,8 +164,8 @@ export namespace tribe {
         /** MessageData type. */
         public type: tribe.MessageType;
 
-        /** MessageData fid. */
-        public fid: (number|Long);
+        /** MessageData tid. */
+        public tid: (number|Long);
 
         /** MessageData timestamp. */
         public timestamp: number;
@@ -173,11 +173,11 @@ export namespace tribe {
         /** MessageData network. */
         public network: tribe.Network;
 
-        /** MessageData castAdd. */
-        public castAdd?: (tribe.ICastAddBody|null);
+        /** MessageData tweetAdd. */
+        public tweetAdd?: (tribe.ITweetAddBody|null);
 
-        /** MessageData castRemove. */
-        public castRemove?: (tribe.ICastRemoveBody|null);
+        /** MessageData tweetRemove. */
+        public tweetRemove?: (tribe.ITweetRemoveBody|null);
 
         /** MessageData reaction. */
         public reaction?: (tribe.IReactionBody|null);
@@ -186,7 +186,7 @@ export namespace tribe {
         public userData?: (tribe.IUserDataBody|null);
 
         /** MessageData body. */
-        public body?: ("castAdd"|"castRemove"|"reaction"|"userData");
+        public body?: ("tweetAdd"|"tweetRemove"|"reaction"|"userData");
 
         /**
          * Creates a new MessageData instance using the specified properties.
@@ -266,218 +266,218 @@ export namespace tribe {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a CastAddBody. */
-    interface ICastAddBody {
+    /** Properties of a TweetAddBody. */
+    interface ITweetAddBody {
 
-        /** CastAddBody text */
+        /** TweetAddBody text */
         text?: (string|null);
 
-        /** CastAddBody mentions */
+        /** TweetAddBody mentions */
         mentions?: ((number|Long)[]|null);
 
-        /** CastAddBody embeds */
+        /** TweetAddBody embeds */
         embeds?: (string[]|null);
 
-        /** CastAddBody parentHash */
+        /** TweetAddBody parentHash */
         parentHash?: (Uint8Array|null);
 
-        /** CastAddBody channelId */
+        /** TweetAddBody channelId */
         channelId?: (string|null);
     }
 
-    /** Represents a CastAddBody. */
-    class CastAddBody implements ICastAddBody {
+    /** Represents a TweetAddBody. */
+    class TweetAddBody implements ITweetAddBody {
 
         /**
-         * Constructs a new CastAddBody.
+         * Constructs a new TweetAddBody.
          * @param [properties] Properties to set
          */
-        constructor(properties?: tribe.ICastAddBody);
+        constructor(properties?: tribe.ITweetAddBody);
 
-        /** CastAddBody text. */
+        /** TweetAddBody text. */
         public text: string;
 
-        /** CastAddBody mentions. */
+        /** TweetAddBody mentions. */
         public mentions: (number|Long)[];
 
-        /** CastAddBody embeds. */
+        /** TweetAddBody embeds. */
         public embeds: string[];
 
-        /** CastAddBody parentHash. */
+        /** TweetAddBody parentHash. */
         public parentHash: Uint8Array;
 
-        /** CastAddBody channelId. */
+        /** TweetAddBody channelId. */
         public channelId: string;
 
         /**
-         * Creates a new CastAddBody instance using the specified properties.
+         * Creates a new TweetAddBody instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns CastAddBody instance
+         * @returns TweetAddBody instance
          */
-        public static create(properties?: tribe.ICastAddBody): tribe.CastAddBody;
+        public static create(properties?: tribe.ITweetAddBody): tribe.TweetAddBody;
 
         /**
-         * Encodes the specified CastAddBody message. Does not implicitly {@link tribe.CastAddBody.verify|verify} messages.
-         * @param message CastAddBody message or plain object to encode
+         * Encodes the specified TweetAddBody message. Does not implicitly {@link tribe.TweetAddBody.verify|verify} messages.
+         * @param message TweetAddBody message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: tribe.ICastAddBody, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: tribe.ITweetAddBody, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified CastAddBody message, length delimited. Does not implicitly {@link tribe.CastAddBody.verify|verify} messages.
-         * @param message CastAddBody message or plain object to encode
+         * Encodes the specified TweetAddBody message, length delimited. Does not implicitly {@link tribe.TweetAddBody.verify|verify} messages.
+         * @param message TweetAddBody message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: tribe.ICastAddBody, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: tribe.ITweetAddBody, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a CastAddBody message from the specified reader or buffer.
+         * Decodes a TweetAddBody message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns CastAddBody
+         * @returns TweetAddBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tribe.CastAddBody;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tribe.TweetAddBody;
 
         /**
-         * Decodes a CastAddBody message from the specified reader or buffer, length delimited.
+         * Decodes a TweetAddBody message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns CastAddBody
+         * @returns TweetAddBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tribe.CastAddBody;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tribe.TweetAddBody;
 
         /**
-         * Verifies a CastAddBody message.
+         * Verifies a TweetAddBody message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a CastAddBody message from a plain object. Also converts values to their respective internal types.
+         * Creates a TweetAddBody message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns CastAddBody
+         * @returns TweetAddBody
          */
-        public static fromObject(object: { [k: string]: any }): tribe.CastAddBody;
+        public static fromObject(object: { [k: string]: any }): tribe.TweetAddBody;
 
         /**
-         * Creates a plain object from a CastAddBody message. Also converts values to other types if specified.
-         * @param message CastAddBody
+         * Creates a plain object from a TweetAddBody message. Also converts values to other types if specified.
+         * @param message TweetAddBody
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: tribe.CastAddBody, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: tribe.TweetAddBody, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this CastAddBody to JSON.
+         * Converts this TweetAddBody to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for CastAddBody
+         * Gets the default type url for TweetAddBody
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a CastRemoveBody. */
-    interface ICastRemoveBody {
+    /** Properties of a TweetRemoveBody. */
+    interface ITweetRemoveBody {
 
-        /** CastRemoveBody targetHash */
+        /** TweetRemoveBody targetHash */
         targetHash?: (Uint8Array|null);
     }
 
-    /** Represents a CastRemoveBody. */
-    class CastRemoveBody implements ICastRemoveBody {
+    /** Represents a TweetRemoveBody. */
+    class TweetRemoveBody implements ITweetRemoveBody {
 
         /**
-         * Constructs a new CastRemoveBody.
+         * Constructs a new TweetRemoveBody.
          * @param [properties] Properties to set
          */
-        constructor(properties?: tribe.ICastRemoveBody);
+        constructor(properties?: tribe.ITweetRemoveBody);
 
-        /** CastRemoveBody targetHash. */
+        /** TweetRemoveBody targetHash. */
         public targetHash: Uint8Array;
 
         /**
-         * Creates a new CastRemoveBody instance using the specified properties.
+         * Creates a new TweetRemoveBody instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns CastRemoveBody instance
+         * @returns TweetRemoveBody instance
          */
-        public static create(properties?: tribe.ICastRemoveBody): tribe.CastRemoveBody;
+        public static create(properties?: tribe.ITweetRemoveBody): tribe.TweetRemoveBody;
 
         /**
-         * Encodes the specified CastRemoveBody message. Does not implicitly {@link tribe.CastRemoveBody.verify|verify} messages.
-         * @param message CastRemoveBody message or plain object to encode
+         * Encodes the specified TweetRemoveBody message. Does not implicitly {@link tribe.TweetRemoveBody.verify|verify} messages.
+         * @param message TweetRemoveBody message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: tribe.ICastRemoveBody, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: tribe.ITweetRemoveBody, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified CastRemoveBody message, length delimited. Does not implicitly {@link tribe.CastRemoveBody.verify|verify} messages.
-         * @param message CastRemoveBody message or plain object to encode
+         * Encodes the specified TweetRemoveBody message, length delimited. Does not implicitly {@link tribe.TweetRemoveBody.verify|verify} messages.
+         * @param message TweetRemoveBody message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: tribe.ICastRemoveBody, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: tribe.ITweetRemoveBody, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a CastRemoveBody message from the specified reader or buffer.
+         * Decodes a TweetRemoveBody message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns CastRemoveBody
+         * @returns TweetRemoveBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tribe.CastRemoveBody;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tribe.TweetRemoveBody;
 
         /**
-         * Decodes a CastRemoveBody message from the specified reader or buffer, length delimited.
+         * Decodes a TweetRemoveBody message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns CastRemoveBody
+         * @returns TweetRemoveBody
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tribe.CastRemoveBody;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tribe.TweetRemoveBody;
 
         /**
-         * Verifies a CastRemoveBody message.
+         * Verifies a TweetRemoveBody message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a CastRemoveBody message from a plain object. Also converts values to their respective internal types.
+         * Creates a TweetRemoveBody message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns CastRemoveBody
+         * @returns TweetRemoveBody
          */
-        public static fromObject(object: { [k: string]: any }): tribe.CastRemoveBody;
+        public static fromObject(object: { [k: string]: any }): tribe.TweetRemoveBody;
 
         /**
-         * Creates a plain object from a CastRemoveBody message. Also converts values to other types if specified.
-         * @param message CastRemoveBody
+         * Creates a plain object from a TweetRemoveBody message. Also converts values to other types if specified.
+         * @param message TweetRemoveBody
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: tribe.CastRemoveBody, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: tribe.TweetRemoveBody, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this CastRemoveBody to JSON.
+         * Converts this TweetRemoveBody to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for CastRemoveBody
+         * Gets the default type url for TweetRemoveBody
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
@@ -693,8 +693,8 @@ export namespace tribe {
     /** MessageType enum. */
     enum MessageType {
         MESSAGE_TYPE_NONE = 0,
-        CAST_ADD = 1,
-        CAST_REMOVE = 2,
+        TWEET_ADD = 1,
+        TWEET_REMOVE = 2,
         REACTION_ADD = 3,
         REACTION_REMOVE = 4,
         LINK_ADD = 5,

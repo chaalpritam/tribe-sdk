@@ -1,16 +1,16 @@
 import { PublicKey, SystemProgram, TransactionSignature } from "@solana/web3.js";
 import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { NetworkConfig } from "../network/types";
-import idl from "../idl/fid_registry.json";
+import idl from "../idl/tid_registry.json";
 
-export interface FidRecord {
-  fid: bigint;
+export interface TidRecord {
+  tid: bigint;
   custodyAddress: PublicKey;
   recoveryAddress: PublicKey;
   registeredAt: number;
 }
 
-export class FidClient {
+export class TidClient {
   private program: Program;
 
   constructor(
@@ -21,62 +21,62 @@ export class FidClient {
   }
 
   /**
-   * Register a new FID for the connected wallet.
+   * Register a new TID for the connected wallet.
    */
-  async register(recoveryAddress: PublicKey): Promise<{ fid: bigint; txSig: string }> {
-    // Read current fid counter to derive the FidRecord PDA
+  async register(recoveryAddress: PublicKey): Promise<{ tid: bigint; txSig: string }> {
+    // Read current tid counter to derive the TidRecord PDA
     const [globalState] = PublicKey.findProgramAddressSync(
       [Buffer.from("global_state")],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     const state = await (this.program.account as any).globalState.fetch(globalState);
-    const nextFid = (state as any).fidCounter as BN;
+    const nextTid = (state as any).tidCounter as BN;
 
-    const [fidRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), nextFid.toArrayLike(Buffer, "le", 8)],
-      this.config.programIds.fidRegistry
+    const [tidRecord] = PublicKey.findProgramAddressSync(
+      [Buffer.from("tid"), nextTid.toArrayLike(Buffer, "le", 8)],
+      this.config.programIds.tidRegistry
     );
 
     const [custodyLookup] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), this.provider.wallet.publicKey.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     const txSig = await this.program.methods
       .register(recoveryAddress)
       .accounts({
         globalState,
-        fidRecord,
+        tidRecord,
         custodyLookup,
         custody: this.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       })
       .rpc();
 
-    return { fid: BigInt(nextFid.toString()), txSig };
+    return { tid: BigInt(nextTid.toString()), txSig };
   }
 
   /**
-   * Transfer FID custody to a new wallet.
+   * Transfer TID custody to a new wallet.
    */
-  async transfer(fid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
-    const [fidRecord] = this.deriveFidRecord(fid);
+  async transfer(tid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
+    const [tidRecord] = this.deriveTidRecord(tid);
 
     const [oldCustodyLookup] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), this.provider.wallet.publicKey.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     const [newCustodyLookup] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), newCustody.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     return this.program.methods
       .transfer(newCustody)
       .accounts({
-        fidRecord,
+        tidRecord,
         oldCustodyLookup,
         newCustodyLookup,
         newCustody,
@@ -87,29 +87,29 @@ export class FidClient {
   }
 
   /**
-   * Recover FID using the recovery address.
+   * Recover TID using the recovery address.
    */
-  async recover(fid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
-    const [fidRecord] = this.deriveFidRecord(fid);
+  async recover(tid: bigint, newCustody: PublicKey): Promise<TransactionSignature> {
+    const [tidRecord] = this.deriveTidRecord(tid);
 
     // Fetch current custody to derive old lookup PDA
-    const record = await (this.program.account as any).fidRecord.fetch(fidRecord);
+    const record = await (this.program.account as any).tidRecord.fetch(tidRecord);
     const oldCustodyAddress = (record as any).custodyAddress as PublicKey;
 
     const [oldCustodyLookup] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), oldCustodyAddress.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     const [newCustodyLookup] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), newCustody.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     return this.program.methods
       .recover(newCustody)
       .accounts({
-        fidRecord,
+        tidRecord,
         oldCustodyLookup,
         newCustodyLookup,
         newCustody,
@@ -120,31 +120,31 @@ export class FidClient {
   }
 
   /**
-   * Change the recovery address for an FID.
+   * Change the recovery address for a TID.
    */
-  async changeRecovery(fid: bigint, newRecovery: PublicKey): Promise<TransactionSignature> {
-    const [fidRecord] = this.deriveFidRecord(fid);
+  async changeRecovery(tid: bigint, newRecovery: PublicKey): Promise<TransactionSignature> {
+    const [tidRecord] = this.deriveTidRecord(tid);
 
     return this.program.methods
       .changeRecovery(newRecovery)
       .accounts({
-        fidRecord,
+        tidRecord,
         custody: this.provider.wallet.publicKey,
       })
       .rpc();
   }
 
   /**
-   * Fetch an FID record by FID number.
+   * Fetch a TID record by TID number.
    */
-  async getFid(fid: bigint): Promise<FidRecord | null> {
-    const [pda] = this.deriveFidRecord(fid);
+  async getTid(tid: bigint): Promise<TidRecord | null> {
+    const [pda] = this.deriveTidRecord(tid);
 
     try {
-      const account = await (this.program.account as any).fidRecord.fetch(pda);
+      const account = await (this.program.account as any).tidRecord.fetch(pda);
       const data = account as any;
       return {
-        fid: BigInt(data.fid.toString()),
+        tid: BigInt(data.tid.toString()),
         custodyAddress: data.custodyAddress,
         recoveryAddress: data.recoveryAddress,
         registeredAt: (data.registeredAt as BN).toNumber(),
@@ -155,32 +155,32 @@ export class FidClient {
   }
 
   /**
-   * Look up an FID by custody address.
+   * Look up a TID by custody address.
    */
-  async getFidByCustody(custodyAddress: PublicKey): Promise<bigint | null> {
+  async getTidByCustody(custodyAddress: PublicKey): Promise<bigint | null> {
     const [pda] = PublicKey.findProgramAddressSync(
       [Buffer.from("custody"), custodyAddress.toBuffer()],
-      this.config.programIds.fidRegistry
+      this.config.programIds.tidRegistry
     );
 
     try {
       const account = await (this.program.account as any).custodyLookup.fetch(pda);
-      return BigInt((account as any).fid.toString());
+      return BigInt((account as any).tid.toString());
     } catch {
       return null;
     }
   }
 
-  private deriveFidRecord(fid: bigint): [PublicKey, number] {
+  private deriveTidRecord(tid: bigint): [PublicKey, number] {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from("fid"), this.fidToBuffer(fid)],
-      this.config.programIds.fidRegistry
+      [Buffer.from("tid"), this.tidToBuffer(tid)],
+      this.config.programIds.tidRegistry
     );
   }
 
-  private fidToBuffer(fid: bigint): Buffer {
+  private tidToBuffer(tid: bigint): Buffer {
     const buf = Buffer.alloc(8);
-    buf.writeBigUInt64LE(fid);
+    buf.writeBigUInt64LE(tid);
     return buf;
   }
 }

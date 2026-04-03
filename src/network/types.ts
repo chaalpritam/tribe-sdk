@@ -5,11 +5,11 @@ export interface NetworkConfig {
   rpcUrl: string;
   wsUrl: string;
   programIds: {
-    fidRegistry: PublicKey;
+    tidRegistry: PublicKey;
     appKeyRegistry: PublicKey;
     usernameRegistry: PublicKey;
     socialGraph: PublicKey;
   };
-  castServerUrl: string;
+  tweetServerUrl: string;
   indexerUrl: string;
 }

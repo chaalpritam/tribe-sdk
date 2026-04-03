@@ -1,2 +1,2 @@
 export { GraphClient } from "./graph";
-export { CastClient, Cast, CastPage } from "./casts";
+export { TweetClient, Tweet, TweetPage } from "./tweets";

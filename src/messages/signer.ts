@@ -2,7 +2,7 @@ import nacl from "tweetnacl";
 import { hash as blake3Hash } from "blake3";
 import { tribe } from "./proto/message";
 import { MessageData, TribeMessage, PROTOCOL_VERSION, MessageType, ReactionType } from "./types";
-import type { CastAddBody, CastRemoveBody, ReactionBody, UserDataBody } from "./types";
+import type { TweetAddBody, TweetRemoveBody, ReactionBody, UserDataBody } from "./types";
 
 /**
  * Sign a message using an ed25519 app key.
@@ -42,16 +42,16 @@ export function verifyMessage(message: TribeMessage): boolean {
 function encodeMessageData(data: MessageData): Uint8Array {
   const protoData: tribe.IMessageData = {
     type: data.type as number as tribe.MessageType,
-    fid: Number(data.fid),
+    tid: Number(data.tid),
     timestamp: data.timestamp,
     network: data.network as number as tribe.Network,
   };
 
   // Set the oneof body field based on message type
   switch (data.type) {
-    case MessageType.CAST_ADD: {
-      const body = data.body as CastAddBody;
-      protoData.castAdd = {
+    case MessageType.TWEET_ADD: {
+      const body = data.body as TweetAddBody;
+      protoData.tweetAdd = {
         text: body.text,
         mentions: body.mentions.map(Number),
         embeds: body.embeds,
@@ -60,9 +60,9 @@ function encodeMessageData(data: MessageData): Uint8Array {
       };
       break;
     }
-    case MessageType.CAST_REMOVE: {
-      const body = data.body as CastRemoveBody;
-      protoData.castRemove = {
+    case MessageType.TWEET_REMOVE: {
+      const body = data.body as TweetRemoveBody;
+      protoData.tweetRemove = {
         targetHash: body.targetHash,
       };
       break;
@@ -96,16 +96,16 @@ export function decodeMessageData(bytes: Uint8Array): MessageData {
   const proto = tribe.MessageData.decode(bytes);
 
   let body;
-  if (proto.castAdd) {
+  if (proto.tweetAdd) {
     body = {
-      text: proto.castAdd.text,
-      mentions: (proto.castAdd.mentions || []).map(BigInt),
-      embeds: proto.castAdd.embeds || [],
-      parentHash: proto.castAdd.parentHash?.length ? proto.castAdd.parentHash : undefined,
-      channelId: proto.castAdd.channelId || undefined,
-    } as CastAddBody;
-  } else if (proto.castRemove) {
-    body = { targetHash: proto.castRemove.targetHash! } as CastRemoveBody;
+      text: proto.tweetAdd.text,
+      mentions: (proto.tweetAdd.mentions || []).map(BigInt),
+      embeds: proto.tweetAdd.embeds || [],
+      parentHash: proto.tweetAdd.parentHash?.length ? proto.tweetAdd.parentHash : undefined,
+      channelId: proto.tweetAdd.channelId || undefined,
+    } as TweetAddBody;
+  } else if (proto.tweetRemove) {
+    body = { targetHash: proto.tweetRemove.targetHash! } as TweetRemoveBody;
   } else if (proto.reaction) {
     body = {
       type: proto.reaction.type as number as ReactionType,
@@ -122,7 +122,7 @@ export function decodeMessageData(bytes: Uint8Array): MessageData {
 
   return {
     type: proto.type as number as MessageType,
-    fid: BigInt(proto.fid?.toString() ?? "0"),
+    tid: BigInt(proto.tid?.toString() ?? "0"),
     timestamp: proto.timestamp,
     network: proto.network as number,
     body,
