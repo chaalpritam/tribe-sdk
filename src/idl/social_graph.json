@@ -88,6 +88,173 @@
       "args": []
     },
     {
+      "name": "follow_delegated",
+      "docs": [
+        "Follow via sequencer authority — used by ER server for batched settlement."
+      ],
+      "discriminator": [
+        234,
+        77,
+        111,
+        22,
+        209,
+        80,
+        177,
+        108
+      ],
+      "accounts": [
+        {
+          "name": "sequencer_config",
+          "docs": [
+            "Sequencer config — validates the authority signer."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  113,
+                  117,
+                  101,
+                  110,
+                  99,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "follower_profile",
+          "docs": [
+            "Follower's social profile — following_count incremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "follower_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "following_profile",
+          "docs": [
+            "Target's social profile — followers_count incremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "following_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "link",
+          "docs": [
+            "The Link PDA — created on follow."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  110,
+                  107
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "follower_tid"
+              },
+              {
+                "kind": "arg",
+                "path": "following_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The sequencer authority — must match sequencer_config.authority."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "follower_tid",
+          "type": "u64"
+        },
+        {
+          "name": "following_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "init_profile",
       "docs": [
         "Initialize a social profile for a TID (once per user)."
@@ -121,6 +288,163 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "init_profile_delegated",
+      "docs": [
+        "Initialize a social profile via sequencer authority — used by ER server."
+      ],
+      "discriminator": [
+        24,
+        66,
+        180,
+        61,
+        33,
+        25,
+        13,
+        174
+      ],
+      "accounts": [
+        {
+          "name": "sequencer_config",
+          "docs": [
+            "Sequencer config — validates the authority signer."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  113,
+                  117,
+                  101,
+                  110,
+                  99,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "social_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "init_sequencer",
+      "docs": [
+        "Initialize the sequencer config (one-time setup by admin)."
+      ],
+      "discriminator": [
+        227,
+        248,
+        18,
+        73,
+        128,
+        217,
+        39,
+        199
+      ],
+      "accounts": [
+        {
+          "name": "sequencer_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  113,
+                  117,
+                  101,
+                  110,
+                  99,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "authority",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "unfollow",
@@ -197,6 +521,169 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "unfollow_delegated",
+      "docs": [
+        "Unfollow via sequencer authority — used by ER server for batched settlement."
+      ],
+      "discriminator": [
+        23,
+        222,
+        24,
+        149,
+        182,
+        60,
+        11,
+        153
+      ],
+      "accounts": [
+        {
+          "name": "sequencer_config",
+          "docs": [
+            "Sequencer config — validates the authority signer."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  113,
+                  117,
+                  101,
+                  110,
+                  99,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "follower_profile",
+          "docs": [
+            "Follower's social profile — following_count decremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "follower_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "following_profile",
+          "docs": [
+            "Target's social profile — followers_count decremented."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  99,
+                  105,
+                  97,
+                  108,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "following_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "link",
+          "docs": [
+            "The Link PDA — closed on unfollow, rent reclaimed to authority."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  110,
+                  107
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "follower_tid"
+              },
+              {
+                "kind": "arg",
+                "path": "following_tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "The sequencer authority — must match sequencer_config.authority."
+          ],
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "follower_tid",
+          "type": "u64"
+        },
+        {
+          "name": "following_tid",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -211,6 +698,19 @@
         91,
         161,
         190
+      ]
+    },
+    {
+      "name": "SequencerConfig",
+      "discriminator": [
+        107,
+        191,
+        121,
+        112,
+        226,
+        139,
+        109,
+        161
       ]
     },
     {
@@ -283,6 +783,11 @@
       "code": 6002,
       "name": "ProfileAlreadyExists",
       "msg": "Profile already initialized"
+    },
+    {
+      "code": 6003,
+      "name": "UnauthorizedSequencer",
+      "msg": "Unauthorized: signer is not the registered sequencer"
     }
   ],
   "types": [
@@ -342,6 +847,30 @@
           {
             "name": "tid",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SequencerConfig",
+      "docs": [
+        "Sequencer configuration — stores the authorized ER server pubkey.",
+        "Only the sequencer can call delegated follow/unfollow instructions."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
