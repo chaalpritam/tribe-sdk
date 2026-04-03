@@ -102,7 +102,10 @@ export class TweetClient {
         signer: Buffer.from(message.signer).toString("base64"),
       }, (_, v) => (typeof v === "bigint" ? v.toString() : v)),
     });
-    if (!res.ok) throw new Error(`Submit failed: ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Submit failed: ${res.status} ${body}`);
+    }
     const result = (await res.json()) as { hash: string };
     return result.hash;
   }

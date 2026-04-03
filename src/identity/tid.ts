@@ -31,7 +31,7 @@ export class TidClient {
     );
 
     const state = await (this.program.account as any).globalState.fetch(globalState);
-    const nextTid = (state as any).tidCounter as BN;
+    const nextTid = ((state as any).tidCounter as BN).add(new BN(1));
 
     const [tidRecord] = PublicKey.findProgramAddressSync(
       [Buffer.from("tid"), nextTid.toArrayLike(Buffer, "le", 8)],
