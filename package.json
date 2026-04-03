@@ -13,7 +13,7 @@
     "proto": "pbjs -t static-module -w commonjs -o src/messages/proto/message.js proto/message.proto && pbts -o src/messages/proto/message.d.ts src/messages/proto/message.js"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.30.1",
+    "@coral-xyz/anchor": "^0.31.1",
     "@solana/web3.js": "^1.95.0",
     "blake3": "2.1.7",
     "protobufjs": "^7.4.0",
