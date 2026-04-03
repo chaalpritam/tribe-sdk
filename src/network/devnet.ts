@@ -11,6 +11,6 @@ export const DEVNET_CONFIG: NetworkConfig = {
     usernameRegistry: new PublicKey("65oKjSjcGYR61ASzDYczbodz6H8TARtJyQGvb5V9y9W1"),
     socialGraph: new PublicKey("8kKnWvbmTjWq5uPePk79RRbQMAXCszNFzHdRwUS4N74w"),
   },
-  tweetServerUrl: "https://tweet.tribe.protocol", // TODO: update after deploy
-  indexerUrl: "https://indexer.tribe.protocol",  // TODO: update after deploy
+  tweetServerUrl: "http://localhost:3000",
+  indexerUrl: "http://localhost:3001",
 };

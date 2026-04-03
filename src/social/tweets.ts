@@ -84,7 +84,7 @@ export class TweetClient {
    * Get a single tweet by hash.
    */
   async getTweet(hash: string): Promise<Tweet | null> {
-    const res = await fetch(`${this.tweetServerUrl}/v1/tweet/${hash}`);
+    const res = await fetch(`${this.tweetServerUrl}/v1/tweet?hash=${encodeURIComponent(hash)}`);
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`Tweet server error: ${res.status}`);
     return (await res.json()) as Tweet;
