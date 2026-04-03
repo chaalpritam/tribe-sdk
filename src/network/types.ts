@@ -12,4 +12,5 @@ export interface NetworkConfig {
   };
   tweetServerUrl: string;
   indexerUrl: string;
+  erServerUrl?: string;
 }
