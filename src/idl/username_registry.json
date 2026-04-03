@@ -53,33 +53,7 @@
         },
         {
           "name": "tid_username",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  105,
-                  100,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114,
-                  110,
-                  97,
-                  109,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "tid_record.tid",
-                "account": "TidRecord"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "custody",
@@ -123,33 +97,7 @@
         },
         {
           "name": "tid_username",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  105,
-                  100,
-                  95,
-                  117,
-                  115,
-                  101,
-                  114,
-                  110,
-                  97,
-                  109,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "tid_record.tid",
-                "account": "TidRecord"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "custody",
@@ -206,10 +154,7 @@
       ],
       "accounts": [
         {
-          "name": "tid_record",
-          "docs": [
-            "Current owner's TID record."
-          ]
+          "name": "tid_record"
         },
         {
           "name": "username_record",
@@ -230,29 +175,16 @@
   ],
   "accounts": [
     {
-      "name": "TidRecord",
-      "discriminator": [
-        49,
-        19,
-        96,
-        1,
-        141,
-        101,
-        23,
-        212
-      ]
-    },
-    {
       "name": "TidUsername",
       "discriminator": [
-        109,
-        89,
-        50,
-        148,
-        222,
-        8,
-        255,
-        120
+        130,
+        67,
+        29,
+        64,
+        95,
+        121,
+        179,
+        119
       ]
     },
     {
@@ -356,37 +288,6 @@
     }
   ],
   "types": [
-    {
-      "name": "TidRecord",
-      "docs": [
-        "TID record from tid-registry (cross-program read)."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tid",
-            "type": "u64"
-          },
-          {
-            "name": "custody_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "recovery_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "registered_at",
-            "type": "i64"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
     {
       "name": "TidUsername",
       "docs": [

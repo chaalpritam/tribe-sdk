@@ -434,19 +434,6 @@
       ]
     },
     {
-      "name": "TidRecord",
-      "discriminator": [
-        49,
-        19,
-        96,
-        1,
-        141,
-        101,
-        23,
-        212
-      ]
-    },
-    {
       "name": "GlobalState",
       "discriminator": [
         163,
@@ -458,48 +445,22 @@
         133,
         98
       ]
+    },
+    {
+      "name": "TidRecord",
+      "discriminator": [
+        232,
+        91,
+        233,
+        217,
+        44,
+        155,
+        229,
+        22
+      ]
     }
   ],
   "events": [
-    {
-      "name": "TidRecovered",
-      "discriminator": [
-        138,
-        177,
-        126,
-        159,
-        15,
-        249,
-        127,
-        229
-      ]
-    },
-    {
-      "name": "TidRegistered",
-      "discriminator": [
-        174,
-        78,
-        248,
-        176,
-        102,
-        96,
-        22,
-        67
-      ]
-    },
-    {
-      "name": "TidTransferred",
-      "discriminator": [
-        17,
-        25,
-        92,
-        175,
-        17,
-        132,
-        242,
-        174
-      ]
-    },
     {
       "name": "RecoveryChanged",
       "discriminator": [
@@ -511,6 +472,45 @@
         189,
         70,
         66
+      ]
+    },
+    {
+      "name": "TidRecovered",
+      "discriminator": [
+        112,
+        28,
+        222,
+        155,
+        98,
+        198,
+        230,
+        239
+      ]
+    },
+    {
+      "name": "TidRegistered",
+      "discriminator": [
+        239,
+        212,
+        112,
+        254,
+        26,
+        109,
+        184,
+        246
+      ]
+    },
+    {
+      "name": "TidTransferred",
+      "discriminator": [
+        170,
+        230,
+        94,
+        170,
+        243,
+        91,
+        0,
+        9
       ]
     }
   ],
@@ -552,6 +552,52 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tid_counter",
+            "docs": [
+              "Auto-incrementing TID counter."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "Authority that initialized the program (governance)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecoveryChanged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tid",
+            "type": "u64"
+          },
+          {
+            "name": "old_recovery",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_recovery",
+            "type": "pubkey"
           }
         ]
       }
@@ -654,52 +700,6 @@
           },
           {
             "name": "new_custody",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "GlobalState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tid_counter",
-            "docs": [
-              "Auto-incrementing TID counter."
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "authority",
-            "docs": [
-              "Authority that initialized the program (governance)."
-            ],
-            "type": "pubkey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RecoveryChanged",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tid",
-            "type": "u64"
-          },
-          {
-            "name": "old_recovery",
-            "type": "pubkey"
-          },
-          {
-            "name": "new_recovery",
             "type": "pubkey"
           }
         ]

@@ -24,45 +24,14 @@
       ],
       "accounts": [
         {
-          "name": "follower_tid_record",
-          "docs": [
-            "Follower's TID record — proves custody ownership."
-          ]
+          "name": "follower_tid_record"
         },
         {
           "name": "follower_profile",
           "docs": [
             "Follower's social profile — following_count incremented."
           ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  111,
-                  99,
-                  105,
-                  97,
-                  108,
-                  95,
-                  112,
-                  114,
-                  111,
-                  102,
-                  105,
-                  108,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "follower_tid_record.tid",
-                "account": "TidRecord"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "following_profile",
@@ -104,30 +73,7 @@
           "docs": [
             "The Link PDA — created on follow."
           ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  105,
-                  110,
-                  107
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "follower_tid_record.tid",
-                "account": "TidRecord"
-              },
-              {
-                "kind": "account",
-                "path": "following_profile.tid",
-                "account": "SocialProfile"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "custody",
@@ -162,35 +108,7 @@
         },
         {
           "name": "social_profile",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  111,
-                  99,
-                  105,
-                  97,
-                  108,
-                  95,
-                  112,
-                  114,
-                  111,
-                  102,
-                  105,
-                  108,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "tid_record.tid",
-                "account": "TidRecord"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "custody",
@@ -221,45 +139,14 @@
       ],
       "accounts": [
         {
-          "name": "follower_tid_record",
-          "docs": [
-            "Follower's TID record — proves custody ownership."
-          ]
+          "name": "follower_tid_record"
         },
         {
           "name": "follower_profile",
           "docs": [
             "Follower's social profile — following_count decremented."
           ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  111,
-                  99,
-                  105,
-                  97,
-                  108,
-                  95,
-                  112,
-                  114,
-                  111,
-                  102,
-                  105,
-                  108,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "follower_tid_record.tid",
-                "account": "TidRecord"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "following_profile",
@@ -301,30 +188,7 @@
           "docs": [
             "The Link PDA — closed on unfollow, rent reclaimed."
           ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  105,
-                  110,
-                  107
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "follower_tid_record.tid",
-                "account": "TidRecord"
-              },
-              {
-                "kind": "account",
-                "path": "following_profile.tid",
-                "account": "SocialProfile"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "custody",
@@ -336,19 +200,6 @@
     }
   ],
   "accounts": [
-    {
-      "name": "TidRecord",
-      "discriminator": [
-        49,
-        19,
-        96,
-        1,
-        141,
-        101,
-        23,
-        212
-      ]
-    },
     {
       "name": "Link",
       "discriminator": [
@@ -435,37 +286,6 @@
     }
   ],
   "types": [
-    {
-      "name": "TidRecord",
-      "docs": [
-        "TID record from tid-registry (cross-program read)."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tid",
-            "type": "u64"
-          },
-          {
-            "name": "custody_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "recovery_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "registered_at",
-            "type": "i64"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
     {
       "name": "Followed",
       "type": {
