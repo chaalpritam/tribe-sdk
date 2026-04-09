@@ -24,6 +24,14 @@ export class TidClient {
    * Register a new TID for the connected wallet.
    */
   async register(recoveryAddress: PublicKey): Promise<{ tid: bigint; txSig: string }> {
+    // Check if this wallet already has a TID registered
+    const existingTid = await this.getTidByCustody(this.provider.wallet.publicKey);
+    if (existingTid !== null) {
+      throw new Error(
+        `Wallet ${this.provider.wallet.publicKey.toBase58()} already has TID #${existingTid} registered. Each wallet can only register one TID.`
+      );
+    }
+
     // Read current tid counter to derive the TidRecord PDA
     const [globalState] = PublicKey.findProgramAddressSync(
       [Buffer.from("global_state")],
