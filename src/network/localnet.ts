@@ -13,4 +13,6 @@ export const LOCALNET_CONFIG: NetworkConfig = {
   },
   tweetServerUrl: "http://localhost:3000",
   indexerUrl: "http://localhost:3001",
+  erServerUrl: "http://localhost:3003",
+  hubUrl: "http://localhost:4000",
 };

@@ -6,7 +6,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   rpcUrl: "https://api.mainnet-beta.solana.com",
   wsUrl: "wss://api.mainnet-beta.solana.com",
   programIds: {
-    // TODO: update after mainnet deploy
+    // Placeholder — replace with actual program IDs after mainnet deployment
     tidRegistry: new PublicKey("11111111111111111111111111111111"),
     appKeyRegistry: new PublicKey("11111111111111111111111111111111"),
     usernameRegistry: new PublicKey("11111111111111111111111111111111"),
@@ -14,4 +14,6 @@ export const MAINNET_CONFIG: NetworkConfig = {
   },
   tweetServerUrl: "https://tweet.tribe.protocol",
   indexerUrl: "https://indexer.tribe.protocol",
+  erServerUrl: "https://er.tribe.protocol",
+  hubUrl: "https://hub.tribe.protocol",
 };
