@@ -12,8 +12,6 @@ export const MAINNET_CONFIG: NetworkConfig = {
     usernameRegistry: new PublicKey("11111111111111111111111111111111"),
     socialGraph: new PublicKey("11111111111111111111111111111111"),
   },
-  tweetServerUrl: "https://tweet.tribe.protocol",
-  indexerUrl: "https://indexer.tribe.protocol",
-  erServerUrl: "https://er.tribe.protocol",
   hubUrl: "https://hub.tribe.protocol",
+  erServerUrl: "https://er.tribe.protocol",
 };

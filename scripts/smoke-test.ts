@@ -3,8 +3,7 @@
  *
  * Prerequisites:
  *   - Programs deployed to devnet
- *   - tribe-tweet-server running on localhost:3000
- *   - tribe-indexer running on localhost:3001
+ *   - tribe-hub running on localhost:4000
  *   - Funded devnet wallet at ~/.config/solana/id.json
  *
  * Usage:
@@ -35,8 +34,7 @@ import path from "path";
 
 const config: NetworkConfig = {
   ...DEVNET_CONFIG,
-  tweetServerUrl: "http://localhost:3000",
-  indexerUrl: "http://localhost:3001",
+  hubUrl: "http://localhost:4000",
 };
 
 // ---------------------------------------------------------------------------
@@ -277,25 +275,25 @@ async function main() {
   const page = await tribe.tweets.getTweetsByTid(tid);
   console.log(`   Tweets for TID ${tid}: ${page.tweets.length}`);
 
-  // -- Step 7: Verify indexer ------------------------------------------------
+  // -- Step 7: Verify hub ------------------------------------------------
 
-  log("7", "Waiting for indexer to pick up events (10s)...");
+  log("7", "Waiting for hub to index events (10s)...");
   await sleep(10000);
 
-  const userRes = await fetch(`${config.indexerUrl}/v1/user/${tid}`);
+  const userRes = await fetch(`${config.hubUrl}/v1/user/${tid}`);
   if (userRes.ok) {
     const userData = await userRes.json();
-    console.log(`   Indexer user:`, JSON.stringify(userData));
+    console.log(`   Hub user:`, JSON.stringify(userData));
   } else {
-    console.log(`   Indexer user lookup: ${userRes.status} (may need more time)`);
+    console.log(`   Hub user lookup: ${userRes.status} (may need more time)`);
   }
 
-  const feedRes = await fetch(`${config.indexerUrl}/v1/feed/${tid}`);
+  const feedRes = await fetch(`${config.hubUrl}/v1/feed/${tid}`);
   if (feedRes.ok) {
     const feedData = await feedRes.json();
-    console.log(`   Indexer feed tweets: ${feedData.tweets?.length ?? 0}`);
+    console.log(`   Hub feed tweets: ${feedData.tweets?.length ?? 0}`);
   } else {
-    console.log(`   Indexer feed: ${feedRes.status}`);
+    console.log(`   Hub feed: ${feedRes.status}`);
   }
 
   // -- Done ------------------------------------------------------------------
@@ -307,8 +305,7 @@ async function main() {
   console.log(`  Username:           ${username}.tribe`);
   console.log(`  Following TID:      ${tid2}`);
   console.log(`  Tweet published:    ${tweetHash}`);
-  console.log(`  Tweet server:       http://localhost:3000`);
-  console.log(`  Indexer:            http://localhost:3001`);
+  console.log(`  Hub:                http://localhost:4000`);
 }
 
 main().catch((err) => {

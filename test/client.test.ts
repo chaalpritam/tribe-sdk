@@ -175,8 +175,7 @@ describe("Network configs", () => {
     expect(DEVNET_CONFIG.cluster).toBe("devnet");
     expect(DEVNET_CONFIG.rpcUrl).toMatch(/^https?:\/\//);
     expect(DEVNET_CONFIG.wsUrl).toMatch(/^wss?:\/\//);
-    expect(DEVNET_CONFIG.tweetServerUrl).toBeDefined();
-    expect(DEVNET_CONFIG.indexerUrl).toBeDefined();
+    expect(DEVNET_CONFIG.hubUrl).toBeDefined();
     expect(DEVNET_CONFIG.programIds).toBeDefined();
   });
 
@@ -184,8 +183,7 @@ describe("Network configs", () => {
     expect(MAINNET_CONFIG.cluster).toBe("mainnet-beta");
     expect(MAINNET_CONFIG.rpcUrl).toMatch(/^https?:\/\//);
     expect(MAINNET_CONFIG.wsUrl).toMatch(/^wss?:\/\//);
-    expect(MAINNET_CONFIG.tweetServerUrl).toBeDefined();
-    expect(MAINNET_CONFIG.indexerUrl).toBeDefined();
+    expect(MAINNET_CONFIG.hubUrl).toBeDefined();
     expect(MAINNET_CONFIG.programIds).toBeDefined();
   });
 
@@ -251,8 +249,7 @@ describe("TribeClient", () => {
       rpcUrl: "https://custom-rpc.example.com",
       wsUrl: "wss://custom-ws.example.com",
       programIds: DEVNET_CONFIG.programIds,
-      tweetServerUrl: "https://custom-tweets.example.com",
-      indexerUrl: "https://custom-indexer.example.com",
+      hubUrl: "https://custom-hub.example.com",
     };
     const client = TribeClient.forNetwork(mockAnchorProvider(), customConfig);
     expect(client.config).toBe(customConfig);

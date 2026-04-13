@@ -25,17 +25,17 @@ export interface TweetPage {
 }
 
 /**
- * Tweet operations — talks to the tweet server via HTTP.
+ * Tweet operations — talks to the hub via HTTP.
  */
 export class TweetClient {
-  private tweetServerUrl: string;
+  private hubUrl: string;
 
   constructor(private config: NetworkConfig) {
-    this.tweetServerUrl = config.tweetServerUrl;
+    this.hubUrl = config.hubUrl;
   }
 
   /**
-   * Publish a new tweet. Signs with the app key and submits to tweet server.
+   * Publish a new tweet. Signs with the app key and submits to the hub.
    */
   async publish(
     tid: bigint,
@@ -75,8 +75,8 @@ export class TweetClient {
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
 
-    const res = await fetch(`${this.tweetServerUrl}/v1/tweetsByTid/${tid}?${params}`);
-    if (!res.ok) throw new Error(`Tweet server error: ${res.status}`);
+    const res = await fetch(`${this.hubUrl}/v1/feed/${tid}?${params}`);
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
     return (await res.json()) as TweetPage;
   }
 
@@ -84,14 +84,14 @@ export class TweetClient {
    * Get a single tweet by hash.
    */
   async getTweet(hash: string): Promise<Tweet | null> {
-    const res = await fetch(`${this.tweetServerUrl}/v1/tweet?hash=${encodeURIComponent(hash)}`);
+    const res = await fetch(`${this.hubUrl}/v1/messages/${encodeURIComponent(hash)}`);
     if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`Tweet server error: ${res.status}`);
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
     return (await res.json()) as Tweet;
   }
 
   private async submitMessage(message: TribeMessage): Promise<string> {
-    const res = await fetch(`${this.tweetServerUrl}/v1/submitMessage`, {
+    const res = await fetch(`${this.hubUrl}/v1/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

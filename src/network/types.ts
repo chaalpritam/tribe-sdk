@@ -10,8 +10,6 @@ export interface NetworkConfig {
     usernameRegistry: PublicKey;
     socialGraph: PublicKey;
   };
-  tweetServerUrl: string;
-  indexerUrl: string;
+  hubUrl: string;
   erServerUrl?: string;
-  hubUrl?: string;
 }

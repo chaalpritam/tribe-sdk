@@ -55,9 +55,9 @@ Social graph interactions routed through the ExecutionProvider.
 
 ### Tweets
 
-Off-chain tweet storage via the tweet server over HTTP.
+Off-chain tweet storage via the hub over HTTP.
 
-- **TweetClient** (`client.tweets`) — `publish()`, query tweets by TID, get a tweet by its blake3 hash. The client builds a signed `TribeMessage`, then POSTs it to the configured tweet server endpoint.
+- **TweetClient** (`client.tweets`) — `publish()`, query tweets by TID, get a tweet by its blake3 hash. The client builds a signed `TribeMessage`, then POSTs it to the configured hub endpoint.
 
 ### Messages
 
@@ -121,8 +121,7 @@ Each `NetworkConfig` includes:
 - `cluster` — `"devnet"`, `"mainnet-beta"`, or `"localnet"`
 - `rpcUrl` / `wsUrl` — Solana JSON-RPC and WebSocket endpoints
 - `programIds` — Public keys for `tidRegistry`, `appKeyRegistry`, `usernameRegistry`, `socialGraph`
-- `tweetServerUrl` — HTTP endpoint for the tweet server
-- `indexerUrl` — HTTP endpoint for the indexer read API
+- `hubUrl` — HTTP endpoint for the hub (tweet storage, indexing, gossip)
 
 ## ExecutionProvider Pattern
 

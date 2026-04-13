@@ -53,7 +53,7 @@ export class TribeClient {
     const execution = options?.execution ?? new DirectSolanaProvider(provider, config);
     this.social = new GraphClient(execution);
 
-    // Tweets — always talk to tweet server.
+    // Tweets — always talk to the hub.
     this.tweets = new TweetClient(config);
   }
 
