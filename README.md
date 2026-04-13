@@ -192,6 +192,15 @@ tribe-sdk/
 | `protobufjs`         | Protobuf serialization/deserialization     |
 | `tweetnacl`          | ed25519 signing for app key signatures     |
 
+## Related Repos
+
+| Repo | Description |
+|------|-------------|
+| [tribe-protocol](../tribe-protocol) | Solana programs (Anchor) -- identity, keys, usernames, social graph |
+| [tribe-hub](../tribe-hub) | Decentralized hub -- tweet storage, indexing, gossip sync |
+| [tribe-er-server](../tribe-er-server) | Ephemeral Rollup sequencer -- instant follows, batched L1 settlement |
+| [tribe-app](../tribe-app) | Next.js frontend -- 10 pages with multi-node failover |
+
 ## License
 
 MIT
