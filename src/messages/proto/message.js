@@ -3335,6 +3335,9 @@ $root.tribe = (function() {
          * @property {string|null} [channelId] ChannelAddBody channelId
          * @property {string|null} [name] ChannelAddBody name
          * @property {string|null} [description] ChannelAddBody description
+         * @property {tribe.ChannelKind|null} [kind] ChannelAddBody kind
+         * @property {number|null} [latitude] ChannelAddBody latitude
+         * @property {number|null} [longitude] ChannelAddBody longitude
          */
 
         /**
@@ -3377,6 +3380,30 @@ $root.tribe = (function() {
         ChannelAddBody.prototype.description = "";
 
         /**
+         * ChannelAddBody kind.
+         * @member {tribe.ChannelKind} kind
+         * @memberof tribe.ChannelAddBody
+         * @instance
+         */
+        ChannelAddBody.prototype.kind = 0;
+
+        /**
+         * ChannelAddBody latitude.
+         * @member {number} latitude
+         * @memberof tribe.ChannelAddBody
+         * @instance
+         */
+        ChannelAddBody.prototype.latitude = 0;
+
+        /**
+         * ChannelAddBody longitude.
+         * @member {number} longitude
+         * @memberof tribe.ChannelAddBody
+         * @instance
+         */
+        ChannelAddBody.prototype.longitude = 0;
+
+        /**
          * Creates a new ChannelAddBody instance using the specified properties.
          * @function create
          * @memberof tribe.ChannelAddBody
@@ -3406,6 +3433,12 @@ $root.tribe = (function() {
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
             if (message.description != null && Object.hasOwnProperty.call(message, "description"))
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.description);
+            if (message.kind != null && Object.hasOwnProperty.call(message, "kind"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
+            if (message.latitude != null && Object.hasOwnProperty.call(message, "latitude"))
+                writer.uint32(/* id 5, wireType 1 =*/41).double(message.latitude);
+            if (message.longitude != null && Object.hasOwnProperty.call(message, "longitude"))
+                writer.uint32(/* id 6, wireType 1 =*/49).double(message.longitude);
             return writer;
         };
 
@@ -3454,6 +3487,18 @@ $root.tribe = (function() {
                         message.description = reader.string();
                         break;
                     }
+                case 4: {
+                        message.kind = reader.int32();
+                        break;
+                    }
+                case 5: {
+                        message.latitude = reader.double();
+                        break;
+                    }
+                case 6: {
+                        message.longitude = reader.double();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -3498,6 +3543,22 @@ $root.tribe = (function() {
             if (message.description != null && message.hasOwnProperty("description"))
                 if (!$util.isString(message.description))
                     return "description: string expected";
+            if (message.kind != null && message.hasOwnProperty("kind"))
+                switch (message.kind) {
+                default:
+                    return "kind: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    break;
+                }
+            if (message.latitude != null && message.hasOwnProperty("latitude"))
+                if (typeof message.latitude !== "number")
+                    return "latitude: number expected";
+            if (message.longitude != null && message.hasOwnProperty("longitude"))
+                if (typeof message.longitude !== "number")
+                    return "longitude: number expected";
             return null;
         };
 
@@ -3519,6 +3580,34 @@ $root.tribe = (function() {
                 message.name = String(object.name);
             if (object.description != null)
                 message.description = String(object.description);
+            switch (object.kind) {
+            default:
+                if (typeof object.kind === "number") {
+                    message.kind = object.kind;
+                    break;
+                }
+                break;
+            case "CHANNEL_KIND_NONE":
+            case 0:
+                message.kind = 0;
+                break;
+            case "GENERAL":
+            case 1:
+                message.kind = 1;
+                break;
+            case "CITY":
+            case 2:
+                message.kind = 2;
+                break;
+            case "INTEREST":
+            case 3:
+                message.kind = 3;
+                break;
+            }
+            if (object.latitude != null)
+                message.latitude = Number(object.latitude);
+            if (object.longitude != null)
+                message.longitude = Number(object.longitude);
             return message;
         };
 
@@ -3539,6 +3628,9 @@ $root.tribe = (function() {
                 object.channelId = "";
                 object.name = "";
                 object.description = "";
+                object.kind = options.enums === String ? "CHANNEL_KIND_NONE" : 0;
+                object.latitude = 0;
+                object.longitude = 0;
             }
             if (message.channelId != null && message.hasOwnProperty("channelId"))
                 object.channelId = message.channelId;
@@ -3546,6 +3638,12 @@ $root.tribe = (function() {
                 object.name = message.name;
             if (message.description != null && message.hasOwnProperty("description"))
                 object.description = message.description;
+            if (message.kind != null && message.hasOwnProperty("kind"))
+                object.kind = options.enums === String ? $root.tribe.ChannelKind[message.kind] === undefined ? message.kind : $root.tribe.ChannelKind[message.kind] : message.kind;
+            if (message.latitude != null && message.hasOwnProperty("latitude"))
+                object.latitude = options.json && !isFinite(message.latitude) ? String(message.latitude) : message.latitude;
+            if (message.longitude != null && message.hasOwnProperty("longitude"))
+                object.longitude = options.json && !isFinite(message.longitude) ? String(message.longitude) : message.longitude;
             return object;
         };
 
@@ -7540,6 +7638,24 @@ $root.tribe = (function() {
         values[valuesById[0] = "REACTION_TYPE_NONE"] = 0;
         values[valuesById[1] = "LIKE"] = 1;
         values[valuesById[2] = "RECAST"] = 2;
+        return values;
+    })();
+
+    /**
+     * ChannelKind enum.
+     * @name tribe.ChannelKind
+     * @enum {number}
+     * @property {number} CHANNEL_KIND_NONE=0 CHANNEL_KIND_NONE value
+     * @property {number} GENERAL=1 GENERAL value
+     * @property {number} CITY=2 CITY value
+     * @property {number} INTEREST=3 INTEREST value
+     */
+    tribe.ChannelKind = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "CHANNEL_KIND_NONE"] = 0;
+        values[valuesById[1] = "GENERAL"] = 1;
+        values[valuesById[2] = "CITY"] = 2;
+        values[valuesById[3] = "INTEREST"] = 3;
         return values;
     })();
 

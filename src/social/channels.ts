@@ -1,6 +1,7 @@
 import { NetworkConfig } from "../network/types";
 import { signMessage } from "../messages/signer";
 import {
+  ChannelKind,
   MessageData,
   MessageType,
   Network,
@@ -11,11 +12,22 @@ export interface ChannelInfo {
   id: string;
   name: string | null;
   description: string | null;
+  kind: ChannelKind | null;
+  latitude: number | null;
+  longitude: number | null;
   created_by: string | null;
   created_at: string | null;
   member_count: number;
   tweet_count: number;
   last_tweet_at: string | null;
+}
+
+export interface CreateChannelOptions {
+  description?: string;
+  /** Defaults to INTEREST when omitted. CITY enables location fields. */
+  kind?: ChannelKind;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface ChannelMember {
@@ -37,13 +49,25 @@ export class ChannelClient {
     creatorTid: bigint,
     channelId: string,
     name: string,
-    description: string | undefined,
+    options: CreateChannelOptions | undefined,
     signingKey: Uint8Array
   ): Promise<string> {
+    const kind = options?.kind ?? ChannelKind.INTEREST;
+    if (kind === ChannelKind.GENERAL) {
+      // The "general" channel is hub-seeded and not user-creatable.
+      throw new Error("ChannelKind.GENERAL is reserved for the hub-seeded default channel");
+    }
     return this.publish(
       MessageType.CHANNEL_ADD,
       creatorTid,
-      { channel_id: channelId, name, description: description ?? null },
+      {
+        channel_id: channelId,
+        name,
+        description: options?.description ?? null,
+        kind,
+        latitude: options?.latitude ?? null,
+        longitude: options?.longitude ?? null,
+      },
       signingKey
     );
   }

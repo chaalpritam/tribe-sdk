@@ -6,6 +6,7 @@ import {
   TweetAddBody,
   Network,
   TribeMessage,
+  GENERAL_CHANNEL_ID,
 } from "../messages/types";
 
 export interface Tweet {
@@ -48,12 +49,17 @@ export class TweetClient {
       channelId?: string;
     }
   ): Promise<string> {
+    // Every tweet must belong to a channel. Fall back to the reserved
+    // "general" channel if the caller didn't pick one — this is the
+    // protocol's "post to everyone" default.
+    const channelId = options?.channelId?.trim() || GENERAL_CHANNEL_ID;
+
     const body: TweetAddBody = {
       text,
       mentions: options?.mentions ?? [],
       embeds: options?.embeds ?? [],
       parentHash: options?.parentHash,
-      channelId: options?.channelId,
+      channelId,
     };
 
     const data: MessageData = {

@@ -44,6 +44,9 @@ message TweetAddBody {
   repeated uint64 mentions = 2;
   repeated string embeds  = 3;
   bytes parent_hash       = 4;  // empty if top-level
+  // Required. Every tweet belongs to exactly one channel. Use the reserved
+  // value "general" for posts that aren't tied to a city or interest group;
+  // hubs reject TWEET_ADD with an empty channel_id.
   string channel_id       = 5;
 }
 
@@ -80,6 +83,9 @@ message ChannelAddBody {
   string channel_id       = 1;  // /^[a-z0-9-]{1,64}$/
   string name             = 2;
   string description      = 3;  // optional
+  ChannelKind kind        = 4;  // GENERAL | CITY | INTEREST
+  double latitude         = 5;  // optional, only meaningful for CITY
+  double longitude        = 6;  // optional, only meaningful for CITY
 }
 
 message ChannelMembershipBody {
@@ -213,6 +219,18 @@ enum ReactionType {
   REACTION_TYPE_NONE      = 0;
   LIKE                    = 1;
   RECAST                  = 2;
+}
+
+enum ChannelKind {
+  CHANNEL_KIND_NONE       = 0;
+  // The reserved "general" channel — every hub seeds one with id "general".
+  // Tweets that aren't posted to a city or interest group land here.
+  GENERAL                 = 1;
+  // City channels carry latitude/longitude and power the hyperlocal feed
+  // and map view. Examples: "san-francisco", "berlin", "bangalore".
+  CITY                    = 2;
+  // Interest groups created by users (e.g. "solana-devs", "rust-lang").
+  INTEREST                = 3;
 }
 
 enum Network {

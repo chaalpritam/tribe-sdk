@@ -1,5 +1,17 @@
 export const PROTOCOL_VERSION = 1;
 
+/**
+ * Reserved id of the protocol-wide default channel. Every hub seeds a
+ * channel with this id; tweets without a user-selected channel land here.
+ */
+export const GENERAL_CHANNEL_ID = "general";
+
+export enum ChannelKind {
+  GENERAL = 1,
+  CITY = 2,
+  INTEREST = 3,
+}
+
 export enum MessageType {
   TWEET_ADD = 1,
   TWEET_REMOVE = 2,
@@ -159,7 +171,25 @@ export interface TweetAddBody {
   mentions: bigint[];
   embeds: string[];
   parentHash?: Uint8Array;
-  channelId?: string;
+  /**
+   * Required at the protocol level. The SDK fills it with
+   * GENERAL_CHANNEL_ID when omitted; hubs reject empty values.
+   */
+  channelId: string;
+}
+
+export interface ChannelAddBody {
+  channelId: string;
+  name: string;
+  description?: string;
+  kind: ChannelKind;
+  /** Only meaningful for CITY channels. */
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface ChannelMembershipBody {
+  channelId: string;
 }
 
 export interface TweetRemoveBody {
@@ -181,6 +211,8 @@ export type MessageBody =
   | TweetRemoveBody
   | ReactionBody
   | UserDataBody
+  | ChannelAddBody
+  | ChannelMembershipBody
   | DmKeyRegisterBody
   | DmSendBody
   | BookmarkBody

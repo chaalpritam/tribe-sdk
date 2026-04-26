@@ -1112,6 +1112,15 @@ export namespace tribe {
 
         /** ChannelAddBody description */
         description?: (string|null);
+
+        /** ChannelAddBody kind */
+        kind?: (tribe.ChannelKind|null);
+
+        /** ChannelAddBody latitude */
+        latitude?: (number|null);
+
+        /** ChannelAddBody longitude */
+        longitude?: (number|null);
     }
 
     /** Represents a ChannelAddBody. */
@@ -1131,6 +1140,15 @@ export namespace tribe {
 
         /** ChannelAddBody description. */
         public description: string;
+
+        /** ChannelAddBody kind. */
+        public kind: tribe.ChannelKind;
+
+        /** ChannelAddBody latitude. */
+        public latitude: number;
+
+        /** ChannelAddBody longitude. */
+        public longitude: number;
 
         /**
          * Creates a new ChannelAddBody instance using the specified properties.
@@ -2840,6 +2858,14 @@ export namespace tribe {
         REACTION_TYPE_NONE = 0,
         LIKE = 1,
         RECAST = 2
+    }
+
+    /** ChannelKind enum. */
+    enum ChannelKind {
+        CHANNEL_KIND_NONE = 0,
+        GENERAL = 1,
+        CITY = 2,
+        INTEREST = 3
     }
 
     /** Network enum. */

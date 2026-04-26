@@ -2,6 +2,7 @@ import nacl from "tweetnacl";
 import { hash as blake3Hash } from "blake3";
 import { tribe } from "./proto/message";
 import { MessageData, TribeMessage, PROTOCOL_VERSION, MessageType, ReactionType } from "./types";
+import { GENERAL_CHANNEL_ID } from "./types";
 import type { TweetAddBody, TweetRemoveBody, ReactionBody, UserDataBody } from "./types";
 
 /**
@@ -132,7 +133,7 @@ export function decodeMessageData(bytes: Uint8Array): MessageData {
       mentions: (proto.tweetAdd.mentions || []).map(BigInt),
       embeds: proto.tweetAdd.embeds || [],
       parentHash: proto.tweetAdd.parentHash?.length ? proto.tweetAdd.parentHash : undefined,
-      channelId: proto.tweetAdd.channelId || undefined,
+      channelId: proto.tweetAdd.channelId || GENERAL_CHANNEL_ID,
     } as TweetAddBody;
   } else if (proto.tweetRemove) {
     body = { targetHash: proto.tweetRemove.targetHash! } as TweetRemoveBody;

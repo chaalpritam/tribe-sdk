@@ -148,6 +148,34 @@ TribeMessage
 
 Tweet text has a maximum length of 320 characters. Tweets can include mentions (TID references), embeds (URLs), a parent hash (for replies), and a channel ID.
 
+### Tweets always live in a channel
+
+Every `TWEET_ADD` belongs to exactly one channel. The SDK fills `channelId` with the reserved value `GENERAL_CHANNEL_ID` (`"general"`) when the caller omits it; hubs reject `TWEET_ADD` with an empty `channel_id`. The `general` channel is hub-seeded on startup and is the protocol's "post to everyone" default.
+
+User-created channels carry a `ChannelKind`:
+
+| Kind | Use |
+|------|-----|
+| `GENERAL`  | Reserved for the seeded `general` channel; cannot be claimed by `CHANNEL_ADD`. |
+| `CITY`     | Hyperlocal channel keyed to a place; carries optional `latitude` / `longitude`. |
+| `INTEREST` | Topic / community channel created by users (e.g. `solana-devs`). Default kind. |
+
+```typescript
+// Implicit channel — lands in the "general" channel
+await client.tweets.publish(tid, "gm", signingKey);
+
+// Explicit channel
+await client.tweets.publish(tid, "gm sf", signingKey, { channelId: "san-francisco" });
+
+// Create a city channel
+import { ChannelKind } from "@tribe-protocol/sdk";
+await client.channels.create(tid, "san-francisco", "San Francisco", {
+  kind: ChannelKind.CITY,
+  latitude: 37.7749,
+  longitude: -122.4194,
+}, signingKey);
+```
+
 ## Network Configuration
 
 The SDK ships with built-in configs for each environment:
