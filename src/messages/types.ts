@@ -25,6 +25,17 @@ export enum MessageType {
   TASK_COMPLETE = 22,
   CROWDFUND_ADD = 23,
   CROWDFUND_PLEDGE = 24,
+  TIP_ADD = 25,
+}
+
+export interface TipAddBody {
+  recipientTid: bigint;
+  amount: number;
+  currency?: string;
+  /** Optional hash of the tweet/comment being tipped against. */
+  targetHash?: string;
+  /** Optional Solana tx signature if a real SPL transfer happened. */
+  txSignature?: string;
 }
 
 export interface CrowdfundAddBody {
@@ -154,7 +165,8 @@ export type MessageBody =
   | TaskAddBody
   | TaskTransitionBody
   | CrowdfundAddBody
-  | CrowdfundPledgeBody;
+  | CrowdfundPledgeBody
+  | TipAddBody;
 
 export interface MessageData {
   type: MessageType;

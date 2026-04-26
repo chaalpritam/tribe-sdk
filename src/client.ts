@@ -18,6 +18,7 @@ import { PollClient } from "./social/polls";
 import { EventClient } from "./social/events";
 import { TaskClient } from "./social/tasks";
 import { CrowdfundClient } from "./social/crowdfunds";
+import { TipClient } from "./social/tips";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -50,6 +51,7 @@ export class TribeClient {
   public readonly events: EventClient;
   public readonly tasks: TaskClient;
   public readonly crowdfunds: CrowdfundClient;
+  public readonly tips: TipClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -95,6 +97,9 @@ export class TribeClient {
 
     // Crowdfunds (off-chain pledge intent).
     this.crowdfunds = new CrowdfundClient(config);
+
+    // Tips — log social signal of value sent.
+    this.tips = new TipClient(config);
   }
 
   /** Connect to Solana devnet. */

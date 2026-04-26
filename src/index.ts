@@ -38,4 +38,5 @@ export {
 } from "./social/events";
 export { TaskClient, TribeTask, TaskStatus } from "./social/tasks";
 export { CrowdfundClient, Crowdfund, Pledge } from "./social/crowdfunds";
+export { TipClient, Tip, TipsForTarget } from "./social/tips";
 export * from "./messages";
