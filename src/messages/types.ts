@@ -20,6 +20,21 @@ export enum MessageType {
   POLL_VOTE = 17,
   EVENT_ADD = 18,
   EVENT_RSVP = 19,
+  TASK_ADD = 20,
+  TASK_CLAIM = 21,
+  TASK_COMPLETE = 22,
+}
+
+export interface TaskAddBody {
+  taskId: string;
+  title: string;
+  description?: string;
+  rewardText?: string;
+  channelId?: string;
+}
+
+export interface TaskTransitionBody {
+  taskId: string;
 }
 
 export interface EventAddBody {
@@ -116,7 +131,9 @@ export type MessageBody =
   | PollAddBody
   | PollVoteBody
   | EventAddBody
-  | EventRsvpBody;
+  | EventRsvpBody
+  | TaskAddBody
+  | TaskTransitionBody;
 
 export interface MessageData {
   type: MessageType;

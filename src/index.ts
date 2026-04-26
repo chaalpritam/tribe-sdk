@@ -36,4 +36,5 @@ export {
   TribeEventWithRsvps,
   RsvpRecord,
 } from "./social/events";
+export { TaskClient, TribeTask, TaskStatus } from "./social/tasks";
 export * from "./messages";
