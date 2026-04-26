@@ -16,11 +16,26 @@ export enum MessageType {
   DM_SEND = 13,
   BOOKMARK_ADD = 14,
   BOOKMARK_REMOVE = 15,
+  POLL_ADD = 16,
+  POLL_VOTE = 17,
 }
 
 export interface BookmarkBody {
   /** Hash of the tweet (or any signed message) being bookmarked. */
   targetHash: string;
+}
+
+export interface PollAddBody {
+  pollId: string;
+  question: string;
+  options: string[];
+  expiresAt?: number;
+  channelId?: string;
+}
+
+export interface PollVoteBody {
+  pollId: string;
+  optionIndex: number;
 }
 
 export interface DmKeyRegisterBody {
@@ -77,7 +92,9 @@ export type MessageBody =
   | UserDataBody
   | DmKeyRegisterBody
   | DmSendBody
-  | BookmarkBody;
+  | BookmarkBody
+  | PollAddBody
+  | PollVoteBody;
 
 export interface MessageData {
   type: MessageType;

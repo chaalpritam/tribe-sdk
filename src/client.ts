@@ -14,6 +14,7 @@ import { DmClient } from "./social/dms";
 import { UserDataClient } from "./social/user-data";
 import { ChannelClient } from "./social/channels";
 import { BookmarkClient } from "./social/bookmarks";
+import { PollClient } from "./social/polls";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -42,6 +43,7 @@ export class TribeClient {
   public readonly userData: UserDataClient;
   public readonly channels: ChannelClient;
   public readonly bookmarks: BookmarkClient;
+  public readonly polls: PollClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -75,6 +77,9 @@ export class TribeClient {
 
     // Per-TID bookmark list.
     this.bookmarks = new BookmarkClient(config);
+
+    // Polls (create + vote + tally).
+    this.polls = new PollClient(config);
   }
 
   /** Connect to Solana devnet. */

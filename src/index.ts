@@ -29,4 +29,5 @@ export {
 } from "./social/user-data";
 export { ChannelClient, ChannelInfo, ChannelMember } from "./social/channels";
 export { BookmarkClient, Bookmark } from "./social/bookmarks";
+export { PollClient, Poll, PollWithTally, PollVote } from "./social/polls";
 export * from "./messages";
