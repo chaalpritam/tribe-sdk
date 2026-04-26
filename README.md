@@ -35,6 +35,19 @@ await client.social.follow(myTid, targetTid);
 
 // Publish tweet
 await client.tweets.publish(tid, "Hello Tribe!", signingKey);
+
+// Send an encrypted DM
+await client.dms.send(myTid, recipientTid, "hey");
+
+// Set a profile field
+await client.userData.set(tid, "bio", "Building on Solana");
+
+// Create a poll, event, task, crowdfund, or tip
+await client.polls.create(tid, "Lunch?", ["Pizza", "Burgers"]);
+await client.events.create(tid, { title: "Meetup", startsAt, location });
+await client.tasks.create(tid, { title: "Translate docs", reward: "10 USDC" });
+await client.crowdfunds.create(tid, { goal: 1000, currency: "USDC" });
+await client.tips.send(senderTid, recipientTid, { amount: 5, currency: "USDC" });
 ```
 
 ## Modules
@@ -58,6 +71,26 @@ Social graph interactions routed through the ExecutionProvider.
 Off-chain tweet storage via the hub over HTTP.
 
 - **TweetClient** (`client.tweets`) — `publish()`, query tweets by TID, get a tweet by its blake3 hash. The client builds a signed `TribeMessage`, then POSTs it to the configured hub endpoint.
+
+### Messaging, Profiles & Discovery
+
+Higher-level clients built on top of `TribeMessage` and the hub HTTP API.
+
+- **DmClient** (`client.dms`) — Encrypted 1:1 and group DMs (x25519 key registration, sealed payloads, read receipts).
+- **UserDataClient** (`client.userData`) — Profile fields (bio, pfp, display name) plus karma lookup.
+- **ChannelClient** (`client.channels`) — Create / join / leave / list channels.
+- **BookmarkClient** (`client.bookmarks`) — Save and remove bookmarked tweets.
+- **SearchClient** (`client.search`) — Search tweets, users, and channels via the hub.
+
+### Community Primitives
+
+Off-chain message envelopes for community actions. The on-chain settlement programs (escrow, karma) are in progress; today these are signed messages persisted by the hub.
+
+- **PollClient** (`client.polls`) — `create()`, `vote()`, `tally()`.
+- **EventClient** (`client.events`) — `create()`, `rsvp()`, list upcoming events.
+- **TaskClient** (`client.tasks`) — `create()`, `claim()`, `complete()` — local tasks with optional rewards.
+- **CrowdfundClient** (`client.crowdfunds`) — `create()`, `pledge()` — community fundraising.
+- **TipClient** (`client.tips`) — Send tips between TIDs, query history.
 
 ### Messages
 
@@ -95,6 +128,23 @@ TribeMessage
 | `CHANNEL_ADD`     | Create a channel               |
 | `CHANNEL_JOIN`    | Join a channel                 |
 | `CHANNEL_LEAVE`   | Leave a channel                |
+| `DM_KEY_REGISTER` | Publish x25519 pubkey for DMs  |
+| `DM_SEND`         | Encrypted 1:1 direct message   |
+| `DM_GROUP_CREATE` | Create a group DM              |
+| `DM_GROUP_SEND`   | Encrypted group DM message     |
+| `DM_READ`         | Mark DM(s) as read             |
+| `BOOKMARK_ADD`    | Save a tweet to bookmarks      |
+| `BOOKMARK_REMOVE` | Remove a bookmark              |
+| `POLL_ADD`        | Create a poll                  |
+| `POLL_VOTE`       | Vote on a poll                 |
+| `EVENT_ADD`       | Create a local event           |
+| `EVENT_RSVP`      | RSVP to an event               |
+| `TASK_ADD`        | Create a local task            |
+| `TASK_CLAIM`      | Claim a task                   |
+| `TASK_COMPLETE`   | Mark a task complete           |
+| `CROWDFUND_ADD`   | Create a crowdfund campaign    |
+| `CROWDFUND_PLEDGE`| Pledge to a crowdfund          |
+| `TIP_ADD`         | Send a tip to a TID            |
 
 Tweet text has a maximum length of 320 characters. Tweets can include mentions (TID references), embeds (URLs), a parent hash (for replies), and a channel ID.
 
@@ -120,7 +170,7 @@ Each `NetworkConfig` includes:
 
 - `cluster` — `"devnet"`, `"mainnet-beta"`, or `"localnet"`
 - `rpcUrl` / `wsUrl` — Solana JSON-RPC and WebSocket endpoints
-- `programIds` — Public keys for `tidRegistry`, `appKeyRegistry`, `usernameRegistry`, `socialGraph`
+- `programIds` — Public keys for `tidRegistry`, `appKeyRegistry`, `usernameRegistry`, `socialGraph`, `hubRegistry`
 - `hubUrl` — HTTP endpoint for the hub (tweet storage, indexing, gossip)
 
 ## ExecutionProvider Pattern
@@ -156,6 +206,16 @@ tribe-sdk/
     social/
       graph.ts                 # GraphClient (follow/unfollow)
       tweets.ts                # TweetClient (publish/query)
+      dms.ts                   # DmClient (1:1 + group DMs, encryption)
+      user-data.ts             # UserDataClient (profile fields, karma)
+      channels.ts              # ChannelClient (create/join/leave/list)
+      bookmarks.ts             # BookmarkClient (save/remove)
+      polls.ts                 # PollClient (create/vote/tally)
+      events.ts                # EventClient (create/rsvp)
+      tasks.ts                 # TaskClient (add/claim/complete)
+      crowdfunds.ts            # CrowdfundClient (create/pledge)
+      tips.ts                  # TipClient (send/history)
+      search.ts                # SearchClient (tweets/users/channels)
     messages/
       types.ts                 # MessageType, TribeMessage types
       signer.ts                # ed25519 signing + blake3 hashing
