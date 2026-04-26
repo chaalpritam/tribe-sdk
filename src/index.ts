@@ -37,4 +37,5 @@ export {
   RsvpRecord,
 } from "./social/events";
 export { TaskClient, TribeTask, TaskStatus } from "./social/tasks";
+export { CrowdfundClient, Crowdfund, Pledge } from "./social/crowdfunds";
 export * from "./messages";

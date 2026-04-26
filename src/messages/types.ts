@@ -23,6 +23,25 @@ export enum MessageType {
   TASK_ADD = 20,
   TASK_CLAIM = 21,
   TASK_COMPLETE = 22,
+  CROWDFUND_ADD = 23,
+  CROWDFUND_PLEDGE = 24,
+}
+
+export interface CrowdfundAddBody {
+  crowdfundId: string;
+  title: string;
+  description?: string;
+  goalAmount: number;
+  currency?: string;
+  deadlineAtUnix?: number;
+  imageUrl?: string;
+  channelId?: string;
+}
+
+export interface CrowdfundPledgeBody {
+  crowdfundId: string;
+  amount: number;
+  currency?: string;
 }
 
 export interface TaskAddBody {
@@ -133,7 +152,9 @@ export type MessageBody =
   | EventAddBody
   | EventRsvpBody
   | TaskAddBody
-  | TaskTransitionBody;
+  | TaskTransitionBody
+  | CrowdfundAddBody
+  | CrowdfundPledgeBody;
 
 export interface MessageData {
   type: MessageType;

@@ -17,6 +17,7 @@ import { BookmarkClient } from "./social/bookmarks";
 import { PollClient } from "./social/polls";
 import { EventClient } from "./social/events";
 import { TaskClient } from "./social/tasks";
+import { CrowdfundClient } from "./social/crowdfunds";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -48,6 +49,7 @@ export class TribeClient {
   public readonly polls: PollClient;
   public readonly events: EventClient;
   public readonly tasks: TaskClient;
+  public readonly crowdfunds: CrowdfundClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -90,6 +92,9 @@ export class TribeClient {
 
     // Tasks (open / claimed / completed state machine).
     this.tasks = new TaskClient(config);
+
+    // Crowdfunds (off-chain pledge intent).
+    this.crowdfunds = new CrowdfundClient(config);
   }
 
   /** Connect to Solana devnet. */
