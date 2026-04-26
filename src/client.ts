@@ -19,6 +19,7 @@ import { EventClient } from "./social/events";
 import { TaskClient } from "./social/tasks";
 import { CrowdfundClient } from "./social/crowdfunds";
 import { TipClient } from "./social/tips";
+import { SearchClient } from "./social/search";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -52,6 +53,7 @@ export class TribeClient {
   public readonly tasks: TaskClient;
   public readonly crowdfunds: CrowdfundClient;
   public readonly tips: TipClient;
+  public readonly search: SearchClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -100,6 +102,9 @@ export class TribeClient {
 
     // Tips — log social signal of value sent.
     this.tips = new TipClient(config);
+
+    // Search — read-only over tweets, users, channels.
+    this.search = new SearchClient(config);
   }
 
   /** Connect to Solana devnet. */
