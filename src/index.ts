@@ -21,6 +21,7 @@ export {
   DmGroupMember,
   DmGroup,
   EncryptedGroupDm,
+  DmReadReceipt,
   generateDmKeypair,
   encryptDm,
   decryptDm,

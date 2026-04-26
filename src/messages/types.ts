@@ -28,6 +28,12 @@ export enum MessageType {
   TIP_ADD = 25,
   DM_GROUP_CREATE = 26,
   DM_GROUP_SEND = 27,
+  DM_READ = 28,
+}
+
+export interface DmReadBody {
+  conversationId: string;
+  lastReadHash: string;
 }
 
 export interface DmGroupCreateBody {
@@ -188,7 +194,8 @@ export type MessageBody =
   | CrowdfundPledgeBody
   | TipAddBody
   | DmGroupCreateBody
-  | DmGroupSendBody;
+  | DmGroupSendBody
+  | DmReadBody;
 
 export interface MessageData {
   type: MessageType;

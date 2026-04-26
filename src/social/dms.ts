@@ -67,6 +67,12 @@ export interface EncryptedGroupDm {
   nonce: string;
 }
 
+export interface DmReadReceipt {
+  tid: string;
+  last_read_hash: string;
+  last_read_at: string;
+}
+
 function toBase64(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64");
 }
@@ -314,6 +320,37 @@ export class DmClient {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`Hub error: ${res.status}`);
     return (await res.json()) as DmGroup;
+  }
+
+  /** Mark progress through a conversation. Monotonic — a stale call
+   *  won't roll back a more recent receipt. */
+  async markRead(
+    tid: bigint,
+    conversationId: string,
+    lastReadHash: string,
+    appSigningKey: Uint8Array
+  ): Promise<void> {
+    const wireBody = {
+      conversation_id: conversationId,
+      last_read_hash: lastReadHash,
+    };
+    const message = this.sign(
+      MessageType.DM_READ,
+      tid,
+      wireBody,
+      appSigningKey
+    );
+    await this.post("/v1/dm/read", message);
+  }
+
+  /** Other participants' last-read state in a conversation. */
+  async getReads(conversationId: string): Promise<DmReadReceipt[]> {
+    const res = await fetch(
+      `${this.hubUrl}/v1/dm/conversations/${encodeURIComponent(conversationId)}/reads`
+    );
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    const json = (await res.json()) as { reads: DmReadReceipt[] };
+    return json.reads;
   }
 
   async groupMessages(
