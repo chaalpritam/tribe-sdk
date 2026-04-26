@@ -11,4 +11,14 @@ export { AppKeyClient, AppKeyRecord, AppKeyScope } from "./identity/app-keys";
 export { UsernameClient, UsernameRecord } from "./identity/usernames";
 export { GraphClient } from "./social/graph";
 export { TweetClient, Tweet, TweetPage } from "./social/tweets";
+export {
+  DmClient,
+  DmKeyRecord,
+  DmConversation,
+  EncryptedDm,
+  DecryptedDm,
+  generateDmKeypair,
+  encryptDm,
+  decryptDm,
+} from "./social/dms";
 export * from "./messages";

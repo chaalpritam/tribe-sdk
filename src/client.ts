@@ -10,6 +10,7 @@ import { AppKeyClient } from "./identity/app-keys";
 import { UsernameClient } from "./identity/usernames";
 import { GraphClient } from "./social/graph";
 import { TweetClient } from "./social/tweets";
+import { DmClient } from "./social/dms";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -34,6 +35,7 @@ export class TribeClient {
   };
   public readonly social: GraphClient;
   public readonly tweets: TweetClient;
+  public readonly dms: DmClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -55,6 +57,9 @@ export class TribeClient {
 
     // Tweets — always talk to the hub.
     this.tweets = new TweetClient(config);
+
+    // DMs — encrypted client-side, hub stores ciphertext only.
+    this.dms = new DmClient(config);
   }
 
   /** Connect to Solana devnet. */

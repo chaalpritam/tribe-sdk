@@ -12,6 +12,23 @@ export enum MessageType {
   CHANNEL_ADD = 9,
   CHANNEL_JOIN = 10,
   CHANNEL_LEAVE = 11,
+  DM_KEY_REGISTER = 12,
+  DM_SEND = 13,
+}
+
+export interface DmKeyRegisterBody {
+  /** Base64 x25519 public key the caller can be reached at. */
+  x25519Pubkey: string;
+}
+
+export interface DmSendBody {
+  recipientTid: bigint;
+  /** Base64 nacl.box ciphertext. */
+  ciphertext: string;
+  /** Base64 24-byte nonce. */
+  nonce: string;
+  /** Base64 sender x25519 public key — needed by the recipient to open. */
+  senderX25519: string;
 }
 
 export enum ReactionType {
@@ -46,7 +63,13 @@ export interface UserDataBody {
   value: string;
 }
 
-export type MessageBody = TweetAddBody | TweetRemoveBody | ReactionBody | UserDataBody;
+export type MessageBody =
+  | TweetAddBody
+  | TweetRemoveBody
+  | ReactionBody
+  | UserDataBody
+  | DmKeyRegisterBody
+  | DmSendBody;
 
 export interface MessageData {
   type: MessageType;
