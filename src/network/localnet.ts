@@ -15,6 +15,7 @@ export const LOCALNET_CONFIG: NetworkConfig = {
     taskRegistry: new PublicKey("TaskReg111111111111111111111111111111111111"),
     channelRegistry: new PublicKey("ChanReg111111111111111111111111111111111111"),
     karmaRegistry: new PublicKey("KarmaReg11111111111111111111111111111111111"),
+    pollRegistry: new PublicKey("HPd8FqxVfoeBxwBr7wuKDeahgGX1V9UewxEWzjZY2SAm"),
   },
   hubUrl: "http://localhost:4000",
   erServerUrl: "http://localhost:3003",

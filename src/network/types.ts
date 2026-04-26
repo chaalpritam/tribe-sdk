@@ -14,6 +14,7 @@ export interface NetworkConfig {
     taskRegistry: PublicKey;
     channelRegistry: PublicKey;
     karmaRegistry: PublicKey;
+    pollRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;

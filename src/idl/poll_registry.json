@@ -1,0 +1,606 @@
+{
+  "address": "HPd8FqxVfoeBxwBr7wuKDeahgGX1V9UewxEWzjZY2SAm",
+  "metadata": {
+    "name": "poll_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain polls with vote-uniqueness for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "create_poll",
+      "docs": [
+        "Create a poll. The poll body (question / options) lives off",
+        "chain in the corresponding POLL_ADD message; this instruction",
+        "only stores its hash and the per-option tally counters",
+        "(capped at 8 options)."
+      ],
+      "discriminator": [
+        182,
+        171,
+        112,
+        238,
+        6,
+        219,
+        14,
+        110
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  108,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "poll",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "creator_state.next_poll_id",
+                "account": "CreatorPollState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "creator_state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "option_count",
+          "type": "u8"
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        },
+        {
+          "name": "has_expiry",
+          "type": "bool"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_creator_state",
+      "docs": [
+        "One-time per-creator setup. Tracks `next_poll_id` so each",
+        "poll the creator publishes has a deterministic PDA."
+      ],
+      "discriminator": [
+        105,
+        60,
+        2,
+        31,
+        14,
+        151,
+        165,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  108,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "creator_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "vote",
+      "docs": [
+        "Cast a vote. The Vote PDA seeded by (poll, voter) has an",
+        "`init` constraint, so each TID can only vote once per poll."
+      ],
+      "discriminator": [
+        227,
+        110,
+        155,
+        23,
+        136,
+        126,
+        172,
+        25
+      ],
+      "accounts": [
+        {
+          "name": "poll",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poll.creator",
+                "account": "Poll"
+              },
+              {
+                "kind": "account",
+                "path": "poll.poll_id",
+                "account": "Poll"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vote_record",
+          "docs": [
+            "`init` is the one-vote-per-TID guard: a second vote attempt",
+            "from the same wallet on the same poll fails because the PDA",
+            "already exists."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  108,
+                  45,
+                  118,
+                  111,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poll"
+              },
+              {
+                "kind": "account",
+                "path": "voter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "voter",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "voter_tid",
+          "type": "u64"
+        },
+        {
+          "name": "option_index",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CreatorPollState",
+      "discriminator": [
+        195,
+        234,
+        8,
+        194,
+        232,
+        15,
+        237,
+        152
+      ]
+    },
+    {
+      "name": "Poll",
+      "discriminator": [
+        110,
+        234,
+        167,
+        188,
+        231,
+        136,
+        153,
+        111
+      ]
+    },
+    {
+      "name": "Vote",
+      "discriminator": [
+        96,
+        91,
+        104,
+        57,
+        145,
+        35,
+        172,
+        155
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "CreatorStateInitialized",
+      "discriminator": [
+        230,
+        161,
+        41,
+        5,
+        138,
+        206,
+        69,
+        157
+      ]
+    },
+    {
+      "name": "PollCreated",
+      "discriminator": [
+        137,
+        85,
+        250,
+        148,
+        2,
+        9,
+        178,
+        39
+      ]
+    },
+    {
+      "name": "PollVoted",
+      "discriminator": [
+        107,
+        135,
+        33,
+        68,
+        58,
+        110,
+        42,
+        92
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadOptionCount",
+      "msg": "Polls must have between 2 and 8 options"
+    },
+    {
+      "code": 6001,
+      "name": "OptionOutOfRange",
+      "msg": "Selected option is out of range"
+    },
+    {
+      "code": 6002,
+      "name": "ExpiryInPast",
+      "msg": "Poll expiration must be in the future"
+    },
+    {
+      "code": 6003,
+      "name": "PollExpired",
+      "msg": "Poll has expired"
+    },
+    {
+      "code": 6004,
+      "name": "SelfVote",
+      "msg": "Voter cannot be the poll creator"
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatorPollState",
+      "docs": [
+        "Per-creator counter. Lives at PDA `[\"poll-creator\", creator_pubkey]`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "next_poll_id",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatorStateInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Poll",
+      "docs": [
+        "One per poll. Lives at PDA",
+        "`[\"poll\", creator_pubkey, poll_id_le]`.",
+        "",
+        "Question text and option labels live in the off-chain POLL_ADD",
+        "envelope; this account stores their hash plus the per-option",
+        "tally counters."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "poll_id",
+            "type": "u64"
+          },
+          {
+            "name": "option_count",
+            "type": "u8"
+          },
+          {
+            "name": "option_votes",
+            "docs": [
+              "option_count <= MAX_POLL_OPTIONS; trailing entries left at zero."
+            ],
+            "type": {
+              "array": [
+                "u32",
+                8
+              ]
+            }
+          },
+          {
+            "name": "total_votes",
+            "type": "u32"
+          },
+          {
+            "name": "expires_at",
+            "type": "i64"
+          },
+          {
+            "name": "has_expiry",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "metadata_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PollCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poll",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "poll_id",
+            "type": "u64"
+          },
+          {
+            "name": "option_count",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PollVoted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poll",
+            "type": "pubkey"
+          },
+          {
+            "name": "voter",
+            "type": "pubkey"
+          },
+          {
+            "name": "voter_tid",
+            "type": "u64"
+          },
+          {
+            "name": "option_index",
+            "type": "u8"
+          },
+          {
+            "name": "new_total_for_option",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vote",
+      "docs": [
+        "One per (poll, voter). Lives at PDA",
+        "`[\"poll-vote\", poll_pubkey, voter_pubkey]`. Existence proves the",
+        "voter has voted; the `init` constraint at vote time enforces",
+        "one-vote-per-TID."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poll",
+            "type": "pubkey"
+          },
+          {
+            "name": "voter",
+            "type": "pubkey"
+          },
+          {
+            "name": "voter_tid",
+            "type": "u64"
+          },
+          {
+            "name": "option_index",
+            "type": "u8"
+          },
+          {
+            "name": "voted_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

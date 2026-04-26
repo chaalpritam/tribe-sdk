@@ -27,3 +27,10 @@ export {
   type KarmaAccount,
   type KarmaProof,
 } from "./karma-registry";
+export {
+  PollOnchainClient,
+  MAX_POLL_OPTIONS_ONCHAIN,
+  type CreatorPollState,
+  type OnchainPoll,
+  type OnchainVote,
+} from "./poll-registry";

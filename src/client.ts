@@ -25,6 +25,7 @@ import { CrowdfundOnchainClient } from "./onchain/crowdfund-registry";
 import { TaskOnchainClient } from "./onchain/task-registry";
 import { ChannelOnchainClient } from "./onchain/channel-registry";
 import { KarmaOnchainClient } from "./onchain/karma-registry";
+import { PollOnchainClient } from "./onchain/poll-registry";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -71,6 +72,7 @@ export class TribeClient {
     tasks: TaskOnchainClient;
     channels: ChannelOnchainClient;
     karma: KarmaOnchainClient;
+    polls: PollOnchainClient;
   };
 
   private constructor(
@@ -131,6 +133,7 @@ export class TribeClient {
       tasks: new TaskOnchainClient(provider, config),
       channels: new ChannelOnchainClient(provider, config),
       karma: new KarmaOnchainClient(provider, config),
+      polls: new PollOnchainClient(provider, config),
     };
   }
 
