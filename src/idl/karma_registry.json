@@ -1,0 +1,644 @@
+{
+  "address": "KarmaReg11111111111111111111111111111111111",
+  "metadata": {
+    "name": "karma_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain karma aggregation for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "init_karma_account",
+      "docs": [
+        "One-time per TID. Anyone can pay the rent to bring a karma",
+        "account into existence — karma is public and counters all",
+        "start at zero, so there's no permission to gate."
+      ],
+      "discriminator": [
+        0,
+        123,
+        22,
+        226,
+        115,
+        30,
+        193,
+        246
+      ],
+      "accounts": [
+        {
+          "name": "karma",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  97,
+                  114,
+                  109,
+                  97
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "record_task_completed",
+      "docs": [
+        "Credit karma for a completed task. Verifies status =",
+        "Completed and claimer_tid matches the karma account; same",
+        "per-record KarmaProof double-count protection."
+      ],
+      "discriminator": [
+        27,
+        162,
+        39,
+        117,
+        71,
+        114,
+        137,
+        102
+      ],
+      "accounts": [
+        {
+          "name": "karma",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  97,
+                  114,
+                  109,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "karma.tid",
+                "account": "KarmaAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "task",
+          "docs": [
+            "The Task to credit. Must be in the Completed state and have",
+            "a claimer_tid matching the karma account."
+          ]
+        },
+        {
+          "name": "karma_proof",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  97,
+                  114,
+                  109,
+                  97,
+                  45,
+                  112,
+                  114,
+                  111,
+                  111,
+                  102
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "task"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "record_tip_received",
+      "docs": [
+        "Credit karma for a tip the recipient received. The handler",
+        "verifies the TipRecord's recipient_tid matches the karma",
+        "account, and the per-record KarmaProof PDA's `init`",
+        "constraint guarantees each tip can only be counted once."
+      ],
+      "discriminator": [
+        25,
+        115,
+        185,
+        32,
+        204,
+        249,
+        253,
+        223
+      ],
+      "accounts": [
+        {
+          "name": "karma",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  97,
+                  114,
+                  109,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "karma.tid",
+                "account": "KarmaAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "tip_record",
+          "docs": [
+            "The TipRecord to credit. Anchor deserializes the bytes",
+            "against tip_registry's account schema; we don't write to it."
+          ]
+        },
+        {
+          "name": "karma_proof",
+          "docs": [
+            "`init` here is the double-count guard: a second call against",
+            "the same TipRecord finds the proof already exists and aborts."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  107,
+                  97,
+                  114,
+                  109,
+                  97,
+                  45,
+                  112,
+                  114,
+                  111,
+                  111,
+                  102
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tip_record"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "KarmaAccount",
+      "discriminator": [
+        84,
+        199,
+        61,
+        137,
+        97,
+        198,
+        90,
+        102
+      ]
+    },
+    {
+      "name": "KarmaProof",
+      "discriminator": [
+        111,
+        244,
+        202,
+        79,
+        126,
+        92,
+        244,
+        148
+      ]
+    },
+    {
+      "name": "Task",
+      "discriminator": [
+        79,
+        34,
+        229,
+        55,
+        88,
+        90,
+        55,
+        84
+      ]
+    },
+    {
+      "name": "TipRecord",
+      "discriminator": [
+        43,
+        243,
+        62,
+        130,
+        183,
+        4,
+        81,
+        185
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "KarmaAccountInitialized",
+      "discriminator": [
+        67,
+        76,
+        192,
+        231,
+        145,
+        100,
+        17,
+        121
+      ]
+    },
+    {
+      "name": "TaskKarmaRecorded",
+      "discriminator": [
+        104,
+        236,
+        6,
+        0,
+        162,
+        87,
+        12,
+        18
+      ]
+    },
+    {
+      "name": "TipKarmaRecorded",
+      "discriminator": [
+        213,
+        245,
+        91,
+        108,
+        152,
+        250,
+        52,
+        104
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TidMismatch",
+      "msg": "TID on the karma account does not match the source record"
+    },
+    {
+      "code": 6001,
+      "name": "TaskNotCompleted",
+      "msg": "Task has not been completed yet"
+    }
+  ],
+  "types": [
+    {
+      "name": "KarmaAccount",
+      "docs": [
+        "Public, append-only karma counters for a TID. Lives at PDA",
+        "`[\"karma\", tid_le_bytes]`. Anyone can fund the account into",
+        "existence; only the per-source `record_*` instructions can",
+        "increment the counters, and each source record (a tip, a task)",
+        "can only be counted once thanks to the KarmaProof PDA."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tid",
+            "type": "u64"
+          },
+          {
+            "name": "tips_received_count",
+            "type": "u64"
+          },
+          {
+            "name": "tips_received_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "tasks_completed_count",
+            "type": "u64"
+          },
+          {
+            "name": "tasks_completed_reward_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KarmaAccountInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "karma",
+            "type": "pubkey"
+          },
+          {
+            "name": "tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KarmaProof",
+      "docs": [
+        "One per (source record, karma account) pair. Lives at PDA",
+        "`[\"karma-proof\", source_record_pubkey]`. Existence is the only",
+        "signal we read — `init` on the account guarantees that the same",
+        "source record can't be credited twice."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "source",
+            "type": "pubkey"
+          },
+          {
+            "name": "kind",
+            "docs": [
+              "1 = tip-registry::TipRecord, 2 = task-registry::Task."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "tid",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Task",
+      "docs": [
+        "One per task. Lives at PDA",
+        "`[\"task\", creator_pubkey, task_id_le]`. Like Crowdfund, this PDA",
+        "doubles as the reward escrow vault — when `reward_amount > 0` the",
+        "creator transfers that many lamports into the PDA on creation,",
+        "and complete/cancel mutate them out via direct lamport mutation."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "task_id",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "claimer",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer_tid",
+            "type": "u64"
+          },
+          {
+            "name": "has_claimer",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "claimed_at",
+            "type": "i64"
+          },
+          {
+            "name": "completed_at",
+            "type": "i64"
+          },
+          {
+            "name": "metadata_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaskKarmaRecorded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "karma",
+            "type": "pubkey"
+          },
+          {
+            "name": "tid",
+            "type": "u64"
+          },
+          {
+            "name": "task",
+            "type": "pubkey"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "new_task_count",
+            "type": "u64"
+          },
+          {
+            "name": "new_task_reward_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TipKarmaRecorded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "karma",
+            "type": "pubkey"
+          },
+          {
+            "name": "tid",
+            "type": "u64"
+          },
+          {
+            "name": "tip_record",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "new_tip_count",
+            "type": "u64"
+          },
+          {
+            "name": "new_tip_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TipRecord",
+      "docs": [
+        "On-chain receipt for a tip. Lives at PDA",
+        "`[\"tip\", sender_pubkey, tip_id_le_bytes]`. Sender, recipient, and",
+        "amount are immutable once written; this is a settled history row."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sender",
+            "type": "pubkey"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "sender_tid",
+            "type": "u64"
+          },
+          {
+            "name": "recipient_tid",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "tip_id",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "target_hash",
+            "docs": [
+              "Optional anchor to a piece of content the tip is for (e.g. the",
+              "blake3 hash of a tweet). Zeroed when `has_target` is false."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "has_target",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

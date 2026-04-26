@@ -13,6 +13,7 @@ export interface NetworkConfig {
     crowdfundRegistry: PublicKey;
     taskRegistry: PublicKey;
     channelRegistry: PublicKey;
+    karmaRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;

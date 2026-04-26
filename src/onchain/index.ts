@@ -21,3 +21,9 @@ export {
   ChannelKindOnchain,
   type ChannelRecord,
 } from "./channel-registry";
+export {
+  KarmaOnchainClient,
+  KarmaProofKind,
+  type KarmaAccount,
+  type KarmaProof,
+} from "./karma-registry";
