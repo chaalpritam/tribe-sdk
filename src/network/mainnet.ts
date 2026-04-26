@@ -11,6 +11,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
     appKeyRegistry: new PublicKey("11111111111111111111111111111111"),
     usernameRegistry: new PublicKey("11111111111111111111111111111111"),
     socialGraph: new PublicKey("11111111111111111111111111111111"),
+    tipRegistry: new PublicKey("11111111111111111111111111111111"),
   },
   hubUrl: "https://hub.tribe.protocol",
   erServerUrl: "https://er.tribe.protocol",

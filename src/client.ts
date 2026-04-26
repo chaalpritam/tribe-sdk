@@ -20,6 +20,7 @@ import { TaskClient } from "./social/tasks";
 import { CrowdfundClient } from "./social/crowdfunds";
 import { TipClient } from "./social/tips";
 import { SearchClient } from "./social/search";
+import { TipOnchainClient } from "./onchain/tip-registry";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -54,6 +55,15 @@ export class TribeClient {
   public readonly crowdfunds: CrowdfundClient;
   public readonly tips: TipClient;
   public readonly search: SearchClient;
+  /**
+   * On-chain Anchor program clients. These wrap the Solana programs
+   * directly (lamport transfers, escrow, voting integrity) — distinct
+   * from the hub-backed clients above which speak to the off-chain
+   * REST API.
+   */
+  public readonly onchain: {
+    tips: TipOnchainClient;
+  };
 
   private constructor(
     provider: AnchorProvider,
@@ -105,6 +115,11 @@ export class TribeClient {
 
     // Search — read-only over tweets, users, channels.
     this.search = new SearchClient(config);
+
+    // On-chain program clients (Anchor-backed).
+    this.onchain = {
+      tips: new TipOnchainClient(provider, config),
+    };
   }
 
   /** Connect to Solana devnet. */

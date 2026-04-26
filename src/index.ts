@@ -61,4 +61,5 @@ export {
   ChannelSearchResult,
   TweetSearchHit,
 } from "./social/search";
+export * from "./onchain";
 export * from "./messages";

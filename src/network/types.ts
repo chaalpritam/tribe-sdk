@@ -9,6 +9,7 @@ export interface NetworkConfig {
     appKeyRegistry: PublicKey;
     usernameRegistry: PublicKey;
     socialGraph: PublicKey;
+    tipRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;
