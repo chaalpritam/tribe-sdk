@@ -14,6 +14,13 @@ export enum MessageType {
   CHANNEL_LEAVE = 11,
   DM_KEY_REGISTER = 12,
   DM_SEND = 13,
+  BOOKMARK_ADD = 14,
+  BOOKMARK_REMOVE = 15,
+}
+
+export interface BookmarkBody {
+  /** Hash of the tweet (or any signed message) being bookmarked. */
+  targetHash: string;
 }
 
 export interface DmKeyRegisterBody {
@@ -69,7 +76,8 @@ export type MessageBody =
   | ReactionBody
   | UserDataBody
   | DmKeyRegisterBody
-  | DmSendBody;
+  | DmSendBody
+  | BookmarkBody;
 
 export interface MessageData {
   type: MessageType;

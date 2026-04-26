@@ -13,6 +13,7 @@ import { TweetClient } from "./social/tweets";
 import { DmClient } from "./social/dms";
 import { UserDataClient } from "./social/user-data";
 import { ChannelClient } from "./social/channels";
+import { BookmarkClient } from "./social/bookmarks";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -40,6 +41,7 @@ export class TribeClient {
   public readonly dms: DmClient;
   public readonly userData: UserDataClient;
   public readonly channels: ChannelClient;
+  public readonly bookmarks: BookmarkClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -70,6 +72,9 @@ export class TribeClient {
 
     // Channel directory + create/join/leave.
     this.channels = new ChannelClient(config);
+
+    // Per-TID bookmark list.
+    this.bookmarks = new BookmarkClient(config);
   }
 
   /** Connect to Solana devnet. */

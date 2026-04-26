@@ -28,4 +28,5 @@ export {
   HubUserResponse,
 } from "./social/user-data";
 export { ChannelClient, ChannelInfo, ChannelMember } from "./social/channels";
+export { BookmarkClient, Bookmark } from "./social/bookmarks";
 export * from "./messages";
