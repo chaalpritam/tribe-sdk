@@ -18,6 +18,26 @@ export enum MessageType {
   BOOKMARK_REMOVE = 15,
   POLL_ADD = 16,
   POLL_VOTE = 17,
+  EVENT_ADD = 18,
+  EVENT_RSVP = 19,
+}
+
+export interface EventAddBody {
+  eventId: string;
+  title: string;
+  description?: string;
+  startsAt: number;
+  endsAt?: number;
+  locationText?: string;
+  latitude?: number;
+  longitude?: number;
+  channelId?: string;
+  imageUrl?: string;
+}
+
+export interface EventRsvpBody {
+  eventId: string;
+  status: "yes" | "no" | "maybe";
 }
 
 export interface BookmarkBody {
@@ -94,7 +114,9 @@ export type MessageBody =
   | DmSendBody
   | BookmarkBody
   | PollAddBody
-  | PollVoteBody;
+  | PollVoteBody
+  | EventAddBody
+  | EventRsvpBody;
 
 export interface MessageData {
   type: MessageType;

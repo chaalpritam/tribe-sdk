@@ -15,6 +15,7 @@ import { UserDataClient } from "./social/user-data";
 import { ChannelClient } from "./social/channels";
 import { BookmarkClient } from "./social/bookmarks";
 import { PollClient } from "./social/polls";
+import { EventClient } from "./social/events";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -44,6 +45,7 @@ export class TribeClient {
   public readonly channels: ChannelClient;
   public readonly bookmarks: BookmarkClient;
   public readonly polls: PollClient;
+  public readonly events: EventClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -80,6 +82,9 @@ export class TribeClient {
 
     // Polls (create + vote + tally).
     this.polls = new PollClient(config);
+
+    // Events + RSVPs.
+    this.events = new EventClient(config);
   }
 
   /** Connect to Solana devnet. */

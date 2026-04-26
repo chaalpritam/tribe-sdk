@@ -30,4 +30,10 @@ export {
 export { ChannelClient, ChannelInfo, ChannelMember } from "./social/channels";
 export { BookmarkClient, Bookmark } from "./social/bookmarks";
 export { PollClient, Poll, PollWithTally, PollVote } from "./social/polls";
+export {
+  EventClient,
+  TribeEvent,
+  TribeEventWithRsvps,
+  RsvpRecord,
+} from "./social/events";
 export * from "./messages";
