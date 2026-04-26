@@ -11,6 +11,7 @@ import { UsernameClient } from "./identity/usernames";
 import { GraphClient } from "./social/graph";
 import { TweetClient } from "./social/tweets";
 import { DmClient } from "./social/dms";
+import { UserDataClient } from "./social/user-data";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -36,6 +37,7 @@ export class TribeClient {
   public readonly social: GraphClient;
   public readonly tweets: TweetClient;
   public readonly dms: DmClient;
+  public readonly userData: UserDataClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -60,6 +62,9 @@ export class TribeClient {
 
     // DMs — encrypted client-side, hub stores ciphertext only.
     this.dms = new DmClient(config);
+
+    // Profile fields (bio, displayName, pfpUrl, ...).
+    this.userData = new UserDataClient(config);
   }
 
   /** Connect to Solana devnet. */

@@ -21,4 +21,10 @@ export {
   encryptDm,
   decryptDm,
 } from "./social/dms";
+export {
+  UserDataClient,
+  UserDataField,
+  UserProfileFields,
+  HubUserResponse,
+} from "./social/user-data";
 export * from "./messages";
