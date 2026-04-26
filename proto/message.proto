@@ -15,10 +15,27 @@ message MessageData {
   uint32 timestamp        = 3;  // unix seconds
   Network network         = 4;
   oneof body {
-    TweetAddBody tweet_add          = 5;
-    TweetRemoveBody tweet_remove    = 6;
-    ReactionBody reaction         = 7;
-    UserDataBody user_data        = 8;
+    TweetAddBody tweet_add                   = 5;
+    TweetRemoveBody tweet_remove             = 6;
+    ReactionBody reaction                    = 7;
+    UserDataBody user_data                   = 8;
+    DmKeyRegisterBody dm_key_register        = 9;
+    DmSendBody dm_send                       = 10;
+    BookmarkBody bookmark                    = 11;
+    ChannelAddBody channel_add               = 12;
+    ChannelMembershipBody channel_membership = 13;
+    PollAddBody poll_add                     = 14;
+    PollVoteBody poll_vote                   = 15;
+    EventAddBody event_add                   = 16;
+    EventRsvpBody event_rsvp                 = 17;
+    TaskAddBody task_add                     = 18;
+    TaskTransitionBody task_transition       = 19;
+    CrowdfundAddBody crowdfund_add           = 20;
+    CrowdfundPledgeBody crowdfund_pledge     = 21;
+    TipAddBody tip_add                       = 22;
+    DmGroupCreateBody dm_group_create        = 23;
+    DmGroupSendBody dm_group_send            = 24;
+    DmReadBody dm_read                       = 25;
   }
 }
 
@@ -40,8 +57,124 @@ message ReactionBody {
 }
 
 message UserDataBody {
-  string field            = 1;  // "display_name", "bio", "pfp", "url"
+  string field            = 1;  // "displayName", "bio", "pfpUrl", "url", "location", "city"
   string value            = 2;
+}
+
+message DmKeyRegisterBody {
+  string x25519_pubkey    = 1;  // base64
+}
+
+message DmSendBody {
+  uint64 recipient_tid    = 1;
+  string ciphertext       = 2;  // base64 nacl.box
+  string nonce            = 3;  // base64 24-byte
+  string sender_x25519    = 4;  // base64
+}
+
+message BookmarkBody {
+  string target_hash      = 1;
+}
+
+message ChannelAddBody {
+  string channel_id       = 1;  // /^[a-z0-9-]{1,64}$/
+  string name             = 2;
+  string description      = 3;  // optional
+}
+
+message ChannelMembershipBody {
+  string channel_id       = 1;
+}
+
+message PollAddBody {
+  string poll_id          = 1;
+  string question         = 2;
+  repeated string options = 3;  // 2-10 entries
+  uint32 expires_at       = 4;  // optional unix seconds
+  string channel_id       = 5;  // optional
+}
+
+message PollVoteBody {
+  string poll_id          = 1;
+  uint32 option_index     = 2;
+}
+
+message EventAddBody {
+  string event_id         = 1;
+  string title            = 2;
+  string description      = 3;
+  uint32 starts_at        = 4;  // unix seconds
+  uint32 ends_at          = 5;  // optional
+  string location_text    = 6;
+  double latitude         = 7;
+  double longitude        = 8;
+  string channel_id       = 9;
+  string image_url        = 10;
+}
+
+message EventRsvpBody {
+  string event_id         = 1;
+  string status           = 2;  // "yes" | "no" | "maybe"
+}
+
+message TaskAddBody {
+  string task_id          = 1;
+  string title            = 2;
+  string description      = 3;
+  string reward_text      = 4;
+  string channel_id       = 5;
+}
+
+message TaskTransitionBody {
+  string task_id          = 1;
+}
+
+message CrowdfundAddBody {
+  string crowdfund_id     = 1;
+  string title            = 2;
+  string description      = 3;
+  double goal_amount      = 4;
+  string currency         = 5;
+  uint32 deadline_at      = 6;
+  string image_url        = 7;
+  string channel_id       = 8;
+}
+
+message CrowdfundPledgeBody {
+  string crowdfund_id     = 1;
+  double amount           = 2;
+  string currency         = 3;
+}
+
+message TipAddBody {
+  uint64 recipient_tid    = 1;
+  double amount           = 2;
+  string currency         = 3;
+  string target_hash      = 4;  // optional
+  string tx_signature     = 5;  // optional
+}
+
+message DmGroupCreateBody {
+  string group_id         = 1;
+  string name             = 2;
+  repeated uint64 member_tids = 3;
+}
+
+message DmGroupCipher {
+  uint64 recipient_tid    = 1;
+  string ciphertext       = 2;
+  string nonce            = 3;
+}
+
+message DmGroupSendBody {
+  string group_id         = 1;
+  string sender_x25519    = 2;
+  repeated DmGroupCipher ciphertexts = 3;
+}
+
+message DmReadBody {
+  string conversation_id  = 1;
+  string last_read_hash   = 2;
 }
 
 enum MessageType {
@@ -57,6 +190,23 @@ enum MessageType {
   CHANNEL_ADD             = 9;
   CHANNEL_JOIN            = 10;
   CHANNEL_LEAVE           = 11;
+  DM_KEY_REGISTER         = 12;
+  DM_SEND                 = 13;
+  BOOKMARK_ADD            = 14;
+  BOOKMARK_REMOVE         = 15;
+  POLL_ADD                = 16;
+  POLL_VOTE               = 17;
+  EVENT_ADD               = 18;
+  EVENT_RSVP              = 19;
+  TASK_ADD                = 20;
+  TASK_CLAIM              = 21;
+  TASK_COMPLETE           = 22;
+  CROWDFUND_ADD           = 23;
+  CROWDFUND_PLEDGE        = 24;
+  TIP_ADD                 = 25;
+  DM_GROUP_CREATE         = 26;
+  DM_GROUP_SEND           = 27;
+  DM_READ                 = 28;
 }
 
 enum ReactionType {
