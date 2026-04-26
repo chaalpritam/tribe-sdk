@@ -13,7 +13,8 @@ export type UserDataField =
   | "displayName"
   | "pfpUrl"
   | "url"
-  | "location";
+  | "location"
+  | "city";
 
 export interface UserProfileFields {
   bio?: string;
@@ -21,6 +22,7 @@ export interface UserProfileFields {
   pfpUrl?: string;
   url?: string;
   location?: string;
+  city?: string;
 }
 
 export interface HubUserResponse {
