@@ -36,6 +36,20 @@ export interface HubUserResponse {
   profile?: UserProfileFields;
 }
 
+export interface KarmaSummary {
+  tid: string;
+  total: number;
+  level: number;
+  breakdown: {
+    tweets: number;
+    reactions_received: number;
+    followers: number;
+    tips_received: number;
+    tasks_completed: number;
+  };
+  weights: Record<string, number>;
+}
+
 /**
  * Publish profile fields (bio / displayName / pfpUrl / url / location)
  * as USER_DATA_ADD envelopes. The latest value per field wins on the
@@ -89,6 +103,13 @@ export class UserDataClient {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`Hub error: ${res.status}`);
     return (await res.json()) as HubUserResponse;
+  }
+
+  /** Karma rollup for a TID. */
+  async getKarma(tid: bigint): Promise<KarmaSummary> {
+    const res = await fetch(`${this.hubUrl}/v1/users/${tid}/karma`);
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    return (await res.json()) as KarmaSummary;
   }
 
   private network(): Network {

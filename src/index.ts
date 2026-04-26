@@ -26,6 +26,7 @@ export {
   UserDataField,
   UserProfileFields,
   HubUserResponse,
+  KarmaSummary,
 } from "./social/user-data";
 export { ChannelClient, ChannelInfo, ChannelMember } from "./social/channels";
 export { BookmarkClient, Bookmark } from "./social/bookmarks";
