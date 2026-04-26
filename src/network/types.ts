@@ -12,6 +12,7 @@ export interface NetworkConfig {
     tipRegistry: PublicKey;
     crowdfundRegistry: PublicKey;
     taskRegistry: PublicKey;
+    channelRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;

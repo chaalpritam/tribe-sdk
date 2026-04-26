@@ -13,6 +13,7 @@ export const LOCALNET_CONFIG: NetworkConfig = {
     tipRegistry: new PublicKey("TipReg1111111111111111111111111111111111111"),
     crowdfundRegistry: new PublicKey("CrowdF11111111111111111111111111111111111111"),
     taskRegistry: new PublicKey("TaskReg111111111111111111111111111111111111"),
+    channelRegistry: new PublicKey("ChanReg111111111111111111111111111111111111"),
   },
   hubUrl: "http://localhost:4000",
   erServerUrl: "http://localhost:3003",

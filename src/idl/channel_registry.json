@@ -1,0 +1,495 @@
+{
+  "address": "ChanReg111111111111111111111111111111111111",
+  "metadata": {
+    "name": "channel_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain CITY / INTEREST channel records for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "register_channel",
+      "docs": [
+        "First-write-wins registration of a channel id. The PDA is",
+        "seeded by the literal id bytes, so each id maps to exactly one",
+        "ChannelRecord across the entire network — no two hubs can",
+        "disagree on who owns \"san-francisco\". On-chain ids are capped",
+        "at 32 bytes; longer slugs route only off-chain in the hub."
+      ],
+      "discriminator": [
+        9,
+        188,
+        246,
+        127,
+        89,
+        91,
+        103,
+        50
+      ],
+      "accounts": [
+        {
+          "name": "channel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  104,
+                  97,
+                  110,
+                  110,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "kind",
+          "type": "u8"
+        },
+        {
+          "name": "owner_tid",
+          "type": "u64"
+        },
+        {
+          "name": "latitude",
+          "type": "f64"
+        },
+        {
+          "name": "longitude",
+          "type": "f64"
+        },
+        {
+          "name": "has_location",
+          "type": "bool"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "transfer_channel",
+      "docs": [
+        "Owner-only. Hand the channel to a new TID + wallet. The",
+        "outgoing owner signs; the incoming owner does not need to",
+        "accept (V1 simple transfer)."
+      ],
+      "discriminator": [
+        27,
+        30,
+        166,
+        145,
+        255,
+        253,
+        146,
+        226
+      ],
+      "accounts": [
+        {
+          "name": "channel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  104,
+                  97,
+                  110,
+                  110,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "channel"
+          ]
+        },
+        {
+          "name": "new_owner",
+          "docs": [
+            "to sign in this V1 transfer. A future iteration could require",
+            "a two-step accept handshake."
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "new_owner_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_channel",
+      "docs": [
+        "Owner-only. Update location and / or off-chain metadata hash.",
+        "The kind cannot change once registered. The `id` argument is",
+        "used to derive the channel's PDA."
+      ],
+      "discriminator": [
+        75,
+        204,
+        94,
+        165,
+        60,
+        180,
+        193,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "channel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  104,
+                  97,
+                  110,
+                  110,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "channel"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "latitude",
+          "type": "f64"
+        },
+        {
+          "name": "longitude",
+          "type": "f64"
+        },
+        {
+          "name": "has_location",
+          "type": "bool"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ChannelRecord",
+      "discriminator": [
+        70,
+        5,
+        34,
+        231,
+        138,
+        45,
+        121,
+        124
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "ChannelRegistered",
+      "discriminator": [
+        143,
+        221,
+        189,
+        78,
+        1,
+        166,
+        183,
+        94
+      ]
+    },
+    {
+      "name": "ChannelTransferred",
+      "discriminator": [
+        243,
+        228,
+        162,
+        10,
+        113,
+        215,
+        19,
+        203
+      ]
+    },
+    {
+      "name": "ChannelUpdated",
+      "discriminator": [
+        161,
+        182,
+        72,
+        128,
+        204,
+        10,
+        62,
+        243
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "IdEmpty",
+      "msg": "Channel id must not be empty"
+    },
+    {
+      "code": 6001,
+      "name": "IdTooLong",
+      "msg": "Channel id is longer than 32 bytes"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidIdChars",
+      "msg": "Channel id must match /^[a-z0-9-]+$/"
+    },
+    {
+      "code": 6003,
+      "name": "ReservedId",
+      "msg": "Channel id \\general\\ is reserved for the hub-seeded default channel"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidKind",
+      "msg": "Kind must be CITY (2) or INTEREST (3); GENERAL (1) is reserved"
+    },
+    {
+      "code": 6005,
+      "name": "NotOwner",
+      "msg": "Signer is not the channel owner"
+    }
+  ],
+  "types": [
+    {
+      "name": "ChannelRecord",
+      "docs": [
+        "Single source of truth for a channel id. Lives at PDA seeds",
+        "`[\"channel\", id_bytes]`. On-chain ids are capped at 32 bytes to fit",
+        "inside Solana's per-seed limit; that's plenty for slugs like",
+        "`san-francisco`, `solana-devs`, or `interest-rust`. Hubs may still",
+        "route longer ids off-chain, but only ids in this registry have",
+        "global ownership guarantees."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "docs": [
+              "Fixed-size buffer holding the literal channel id bytes",
+              "(left-aligned, zero-padded). Use `id_len` to slice."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "id_len",
+            "type": "u8"
+          },
+          {
+            "name": "kind",
+            "docs": [
+              "1 = GENERAL (reserved, never written by this program),",
+              "2 = CITY, 3 = INTEREST."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner_tid",
+            "type": "u64"
+          },
+          {
+            "name": "metadata_hash",
+            "docs": [
+              "Hash of the off-chain CHANNEL_ADD envelope so apps can fetch",
+              "title / description / image without a second round trip."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "latitude",
+            "type": "f64"
+          },
+          {
+            "name": "longitude",
+            "type": "f64"
+          },
+          {
+            "name": "has_location",
+            "docs": [
+              "True iff `latitude`/`longitude` are meaningful. Cities almost",
+              "always set this; interest groups normally don't."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "channel",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner_tid",
+            "type": "u64"
+          },
+          {
+            "name": "kind",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "channel",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_owner_tid",
+            "type": "u64"
+          },
+          {
+            "name": "new_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_owner_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "channel",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

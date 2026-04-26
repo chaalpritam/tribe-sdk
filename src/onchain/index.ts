@@ -16,3 +16,8 @@ export {
   type CreatorTaskState,
   type Task as OnchainTask,
 } from "./task-registry";
+export {
+  ChannelOnchainClient,
+  ChannelKindOnchain,
+  type ChannelRecord,
+} from "./channel-registry";

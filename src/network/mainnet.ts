@@ -14,6 +14,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
     tipRegistry: new PublicKey("11111111111111111111111111111111"),
     crowdfundRegistry: new PublicKey("11111111111111111111111111111111"),
     taskRegistry: new PublicKey("11111111111111111111111111111111"),
+    channelRegistry: new PublicKey("11111111111111111111111111111111"),
   },
   hubUrl: "https://hub.tribe.protocol",
   erServerUrl: "https://er.tribe.protocol",
