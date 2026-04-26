@@ -1,0 +1,678 @@
+{
+  "address": "TaskReg111111111111111111111111111111111111",
+  "metadata": {
+    "name": "task_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain local tasks with optional reward escrow for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "cancel_task",
+      "docs": [
+        "Creator-only. Cancel an open task and refund any escrow.",
+        "Cannot be used once the task has been claimed."
+      ],
+      "discriminator": [
+        69,
+        228,
+        134,
+        187,
+        134,
+        105,
+        238,
+        48
+      ],
+      "accounts": [
+        {
+          "name": "task",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "task.task_id",
+                "account": "Task"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "task"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_task",
+      "docs": [
+        "Claim an open task. Locks the task to a single claimer until",
+        "the creator marks it complete or cancels."
+      ],
+      "discriminator": [
+        49,
+        222,
+        219,
+        238,
+        155,
+        68,
+        221,
+        136
+      ],
+      "accounts": [
+        {
+          "name": "task",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "task.creator",
+                "account": "Task"
+              },
+              {
+                "kind": "account",
+                "path": "task.task_id",
+                "account": "Task"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claimer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "claimer_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "complete_task",
+      "docs": [
+        "Creator-only. Marks the task complete and releases the escrow",
+        "(if any) to the claimer."
+      ],
+      "discriminator": [
+        109,
+        167,
+        192,
+        41,
+        129,
+        108,
+        220,
+        196
+      ],
+      "accounts": [
+        {
+          "name": "task",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "task.task_id",
+                "account": "Task"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claimer",
+          "docs": [
+            "only credit lamports to it; no signature required from the",
+            "claimer (creator attests to completion in this V1)."
+          ],
+          "writable": true,
+          "relations": [
+            "task"
+          ]
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "task"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_task",
+      "docs": [
+        "Create a task. If `reward_amount > 0`, the creator escrows",
+        "that many lamports into the Task PDA; the reward is paid out",
+        "to the claimer on completion or returned to the creator on",
+        "cancel."
+      ],
+      "discriminator": [
+        194,
+        80,
+        6,
+        180,
+        232,
+        127,
+        48,
+        171
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "task",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "creator_state.next_task_id",
+                "account": "CreatorTaskState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "creator_state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reward_amount",
+          "type": "u64"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_creator_state",
+      "docs": [
+        "One-time per-creator setup. Creates the CreatorTaskState PDA",
+        "tracking a monotonic `next_task_id`."
+      ],
+      "discriminator": [
+        105,
+        60,
+        2,
+        31,
+        14,
+        151,
+        165,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  97,
+                  115,
+                  107,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "creator_tid",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CreatorTaskState",
+      "discriminator": [
+        115,
+        16,
+        194,
+        59,
+        112,
+        189,
+        31,
+        162
+      ]
+    },
+    {
+      "name": "Task",
+      "discriminator": [
+        79,
+        34,
+        229,
+        55,
+        88,
+        90,
+        55,
+        84
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "CreatorStateInitialized",
+      "discriminator": [
+        230,
+        161,
+        41,
+        5,
+        138,
+        206,
+        69,
+        157
+      ]
+    },
+    {
+      "name": "TaskCancelled",
+      "discriminator": [
+        158,
+        101,
+        220,
+        187,
+        16,
+        141,
+        141,
+        64
+      ]
+    },
+    {
+      "name": "TaskClaimed",
+      "discriminator": [
+        208,
+        90,
+        243,
+        116,
+        80,
+        15,
+        228,
+        202
+      ]
+    },
+    {
+      "name": "TaskCompleted",
+      "discriminator": [
+        132,
+        223,
+        98,
+        152,
+        2,
+        9,
+        57,
+        128
+      ]
+    },
+    {
+      "name": "TaskCreated",
+      "discriminator": [
+        49,
+        174,
+        6,
+        7,
+        71,
+        159,
+        69,
+        175
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotOpen",
+      "msg": "Task is not open"
+    },
+    {
+      "code": 6001,
+      "name": "NotClaimed",
+      "msg": "Task has not been claimed"
+    },
+    {
+      "code": 6002,
+      "name": "SelfClaim",
+      "msg": "Task creator cannot claim their own task"
+    },
+    {
+      "code": 6003,
+      "name": "NotClaimer",
+      "msg": "Signer is not the task's claimer"
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatorStateInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatorTaskState",
+      "docs": [
+        "Per-creator counter. Lives at PDA `[\"task-creator\", creator_pubkey]`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "next_task_id",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Task",
+      "docs": [
+        "One per task. Lives at PDA",
+        "`[\"task\", creator_pubkey, task_id_le]`. Like Crowdfund, this PDA",
+        "doubles as the reward escrow vault — when `reward_amount > 0` the",
+        "creator transfers that many lamports into the PDA on creation,",
+        "and complete/cancel mutate them out via direct lamport mutation."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "task_id",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "claimer",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer_tid",
+            "type": "u64"
+          },
+          {
+            "name": "has_claimer",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "claimed_at",
+            "type": "i64"
+          },
+          {
+            "name": "completed_at",
+            "type": "i64"
+          },
+          {
+            "name": "metadata_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaskCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "task",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "refunded",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaskClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "task",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaskCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "task",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer",
+            "type": "pubkey"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaskCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "task",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "task_id",
+            "type": "u64"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -11,6 +11,7 @@ export interface NetworkConfig {
     socialGraph: PublicKey;
     tipRegistry: PublicKey;
     crowdfundRegistry: PublicKey;
+    taskRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;

@@ -22,6 +22,7 @@ import { TipClient } from "./social/tips";
 import { SearchClient } from "./social/search";
 import { TipOnchainClient } from "./onchain/tip-registry";
 import { CrowdfundOnchainClient } from "./onchain/crowdfund-registry";
+import { TaskOnchainClient } from "./onchain/task-registry";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -65,6 +66,7 @@ export class TribeClient {
   public readonly onchain: {
     tips: TipOnchainClient;
     crowdfunds: CrowdfundOnchainClient;
+    tasks: TaskOnchainClient;
   };
 
   private constructor(
@@ -122,6 +124,7 @@ export class TribeClient {
     this.onchain = {
       tips: new TipOnchainClient(provider, config),
       crowdfunds: new CrowdfundOnchainClient(provider, config),
+      tasks: new TaskOnchainClient(provider, config),
     };
   }
 
