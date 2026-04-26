@@ -156,6 +156,27 @@ export function decodeRichDm(plaintext: string): RichDmPayload | null {
 }
 
 /**
+ * Like {@link encryptDm} but generates a fresh sender keypair per
+ * message — the senderX25519 in the result is the ephemeral pubkey,
+ * not the caller's long-term identity. This buys partial forward
+ * secrecy: a later compromise of the sender's long-term key doesn't
+ * decrypt past ciphertexts (the ephemeral private is dropped after
+ * the call returns).
+ *
+ * Caveats: if the recipient's long-term key is compromised, all
+ * messages addressed to them are still readable. True ratcheting
+ * forward secrecy requires both sides to rotate keys per message,
+ * which is out of scope for v1.
+ */
+export function encryptDmEphemeral(
+  plaintext: string,
+  recipientX25519Pubkey: string
+): { ciphertext: string; nonce: string; senderX25519: string } {
+  const ephemeral = nacl.box.keyPair();
+  return encryptDm(plaintext, recipientX25519Pubkey, ephemeral);
+}
+
+/**
  * Decrypt an EncryptedDm using the recipient's keypair. Returns null if
  * the ciphertext can't be opened (wrong recipient, tampered, etc.).
  */
@@ -241,6 +262,20 @@ export class DmClient {
     const peer = await this.getKey(recipientTid);
     if (!peer) throw new Error(`Recipient TID ${recipientTid} has no DM key`);
     const encrypted = encryptDm(plaintext, peer.x25519_pubkey, senderKeypair);
+    return this.send(senderTid, recipientTid, encrypted, appSigningKey);
+  }
+
+  /** Like {@link sendText} but generates an ephemeral sender keypair
+   *  per message — partial forward secrecy. See encryptDmEphemeral. */
+  async sendTextEphemeral(
+    senderTid: bigint,
+    recipientTid: bigint,
+    plaintext: string,
+    appSigningKey: Uint8Array
+  ): Promise<{ hash: string; conversationId: string }> {
+    const peer = await this.getKey(recipientTid);
+    if (!peer) throw new Error(`Recipient TID ${recipientTid} has no DM key`);
+    const encrypted = encryptDmEphemeral(plaintext, peer.x25519_pubkey);
     return this.send(senderTid, recipientTid, encrypted, appSigningKey);
   }
 

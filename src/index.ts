@@ -26,6 +26,7 @@ export {
   RichDmPayload,
   generateDmKeypair,
   encryptDm,
+  encryptDmEphemeral,
   decryptDm,
   encodeRichDm,
   decodeRichDm,
