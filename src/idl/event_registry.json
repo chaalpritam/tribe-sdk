@@ -1,0 +1,736 @@
+{
+  "address": "D2Gt2qkNAa8gZAmvqt3PWH39ydBL1cpwuXqeogkCoPRk",
+  "metadata": {
+    "name": "event_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain events with one-RSVP-per-TID for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "create_event",
+      "docs": [
+        "Create an event. Title / description / location_text live in",
+        "the off-chain EVENT_ADD envelope; this account stores its",
+        "hash plus the timing window, optional lat/lon, and the",
+        "running RSVP counters (yes / no / maybe)."
+      ],
+      "discriminator": [
+        49,
+        219,
+        29,
+        203,
+        22,
+        98,
+        100,
+        87
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "event",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "creator_state.next_event_id",
+                "account": "CreatorEventState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "creator_state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "starts_at",
+          "type": "i64"
+        },
+        {
+          "name": "ends_at",
+          "type": "i64"
+        },
+        {
+          "name": "has_end",
+          "type": "bool"
+        },
+        {
+          "name": "latitude",
+          "type": "f64"
+        },
+        {
+          "name": "longitude",
+          "type": "f64"
+        },
+        {
+          "name": "has_location",
+          "type": "bool"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_creator_state",
+      "docs": [
+        "One-time per-creator setup. Tracks `next_event_id` so each",
+        "event the creator publishes has a deterministic PDA."
+      ],
+      "discriminator": [
+        105,
+        60,
+        2,
+        31,
+        14,
+        151,
+        165,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "creator_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "rsvp",
+      "docs": [
+        "RSVP yes / no / maybe to an event. The Rsvp PDA seeded by",
+        "(event, attendee) has an `init` constraint, so each TID can",
+        "only RSVP once per event. Use `update_rsvp` to change a",
+        "previous response."
+      ],
+      "discriminator": [
+        134,
+        164,
+        221,
+        33,
+        183,
+        12,
+        73,
+        32
+      ],
+      "accounts": [
+        {
+          "name": "event",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event.creator",
+                "account": "Event"
+              },
+              {
+                "kind": "account",
+                "path": "event.event_id",
+                "account": "Event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "rsvp_record",
+          "docs": [
+            "`init` is the one-RSVP-per-TID guard: a second RSVP from the",
+            "same wallet on the same event fails because the PDA already",
+            "exists. To change a response, use `update_rsvp`."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  115,
+                  118,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              },
+              {
+                "kind": "account",
+                "path": "attendee"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attendee",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "attendee_tid",
+          "type": "u64"
+        },
+        {
+          "name": "status",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "update_rsvp",
+      "docs": [
+        "Change an existing RSVP. Decrements the previous status's",
+        "counter and increments the new one."
+      ],
+      "discriminator": [
+        133,
+        246,
+        132,
+        11,
+        142,
+        135,
+        34,
+        5
+      ],
+      "accounts": [
+        {
+          "name": "event",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event.creator",
+                "account": "Event"
+              },
+              {
+                "kind": "account",
+                "path": "event.event_id",
+                "account": "Event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "rsvp_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  115,
+                  118,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              },
+              {
+                "kind": "account",
+                "path": "attendee"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attendee",
+          "signer": true,
+          "relations": [
+            "rsvp_record"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CreatorEventState",
+      "discriminator": [
+        56,
+        103,
+        26,
+        232,
+        115,
+        104,
+        25,
+        218
+      ]
+    },
+    {
+      "name": "Event",
+      "discriminator": [
+        125,
+        192,
+        125,
+        158,
+        9,
+        115,
+        152,
+        233
+      ]
+    },
+    {
+      "name": "Rsvp",
+      "discriminator": [
+        59,
+        196,
+        250,
+        232,
+        44,
+        92,
+        120,
+        161
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "CreatorStateInitialized",
+      "discriminator": [
+        230,
+        161,
+        41,
+        5,
+        138,
+        206,
+        69,
+        157
+      ]
+    },
+    {
+      "name": "EventCreated",
+      "discriminator": [
+        59,
+        186,
+        199,
+        175,
+        242,
+        25,
+        238,
+        94
+      ]
+    },
+    {
+      "name": "EventRsvpUpdated",
+      "discriminator": [
+        205,
+        199,
+        196,
+        16,
+        22,
+        53,
+        90,
+        128
+      ]
+    },
+    {
+      "name": "EventRsvped",
+      "discriminator": [
+        59,
+        157,
+        92,
+        203,
+        170,
+        143,
+        50,
+        30
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "StartInPast",
+      "msg": "Event must start in the future"
+    },
+    {
+      "code": 6001,
+      "name": "EndBeforeStart",
+      "msg": "Event end time must be after the start time"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidRsvpStatus",
+      "msg": "RSVP status must be 1 (yes), 2 (no), or 3 (maybe)"
+    },
+    {
+      "code": 6003,
+      "name": "NoOpUpdate",
+      "msg": "RSVP status is unchanged"
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatorEventState",
+      "docs": [
+        "Per-creator counter. Lives at PDA `[\"event-creator\", creator_pubkey]`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "next_event_id",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatorStateInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Event",
+      "docs": [
+        "One per event. Lives at PDA",
+        "`[\"event\", creator_pubkey, event_id_le]`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "event_id",
+            "type": "u64"
+          },
+          {
+            "name": "starts_at",
+            "type": "i64"
+          },
+          {
+            "name": "ends_at",
+            "type": "i64"
+          },
+          {
+            "name": "has_end",
+            "type": "bool"
+          },
+          {
+            "name": "latitude",
+            "type": "f64"
+          },
+          {
+            "name": "longitude",
+            "type": "f64"
+          },
+          {
+            "name": "has_location",
+            "type": "bool"
+          },
+          {
+            "name": "yes_count",
+            "type": "u32"
+          },
+          {
+            "name": "no_count",
+            "type": "u32"
+          },
+          {
+            "name": "maybe_count",
+            "type": "u32"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "metadata_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "event_id",
+            "type": "u64"
+          },
+          {
+            "name": "starts_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventRsvpUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_status",
+            "type": "u8"
+          },
+          {
+            "name": "new_status",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventRsvped",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee_tid",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rsvp",
+      "docs": [
+        "One per (event, attendee). Lives at PDA",
+        "`[\"rsvp\", event_pubkey, attendee_pubkey]`. Created on first RSVP",
+        "(init constraint enforces uniqueness); status can be flipped via",
+        "`update_rsvp` without spawning a second account."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee_tid",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "responded_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

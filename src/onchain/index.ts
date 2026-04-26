@@ -34,3 +34,10 @@ export {
   type OnchainPoll,
   type OnchainVote,
 } from "./poll-registry";
+export {
+  EventOnchainClient,
+  RsvpStatus,
+  type CreatorEventState,
+  type OnchainEvent,
+  type OnchainRsvp,
+} from "./event-registry";

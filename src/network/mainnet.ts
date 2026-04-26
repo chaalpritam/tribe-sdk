@@ -17,6 +17,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
     channelRegistry: new PublicKey("11111111111111111111111111111111"),
     karmaRegistry: new PublicKey("11111111111111111111111111111111"),
     pollRegistry: new PublicKey("11111111111111111111111111111111"),
+    eventRegistry: new PublicKey("11111111111111111111111111111111"),
   },
   hubUrl: "https://hub.tribe.protocol",
   erServerUrl: "https://er.tribe.protocol",

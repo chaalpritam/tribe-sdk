@@ -26,6 +26,7 @@ import { TaskOnchainClient } from "./onchain/task-registry";
 import { ChannelOnchainClient } from "./onchain/channel-registry";
 import { KarmaOnchainClient } from "./onchain/karma-registry";
 import { PollOnchainClient } from "./onchain/poll-registry";
+import { EventOnchainClient } from "./onchain/event-registry";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -73,6 +74,7 @@ export class TribeClient {
     channels: ChannelOnchainClient;
     karma: KarmaOnchainClient;
     polls: PollOnchainClient;
+    events: EventOnchainClient;
   };
 
   private constructor(
@@ -134,6 +136,7 @@ export class TribeClient {
       channels: new ChannelOnchainClient(provider, config),
       karma: new KarmaOnchainClient(provider, config),
       polls: new PollOnchainClient(provider, config),
+      events: new EventOnchainClient(provider, config),
     };
   }
 
