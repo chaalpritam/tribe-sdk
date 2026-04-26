@@ -22,9 +22,13 @@ export {
   DmGroup,
   EncryptedGroupDm,
   DmReadReceipt,
+  DmAttachment,
+  RichDmPayload,
   generateDmKeypair,
   encryptDm,
   decryptDm,
+  encodeRichDm,
+  decodeRichDm,
 } from "./social/dms";
 export {
   UserDataClient,

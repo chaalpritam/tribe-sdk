@@ -115,6 +115,46 @@ export function encryptDm(
   };
 }
 
+export interface DmAttachment {
+  /** URL where the (optionally encrypted) blob lives. */
+  url: string;
+  /** MIME type — png, mp4, etc. */
+  contentType?: string;
+  /** Optional opaque size hint. */
+  size?: number;
+  /**
+   * If the blob at `url` is encrypted, base64 nacl.secretbox key + nonce
+   * to decrypt it. Omit for public CDN-style attachments.
+   */
+  decryptionKey?: string;
+  decryptionNonce?: string;
+}
+
+export interface RichDmPayload {
+  text: string;
+  attachments?: DmAttachment[];
+}
+
+/** Convert a rich payload to the plaintext blob fed into encryptDm. */
+export function encodeRichDm(payload: RichDmPayload): string {
+  // Versioned envelope so future fields can be added without breaking
+  // older readers.
+  return JSON.stringify({ v: 1, ...payload });
+}
+
+/** Reverse of encodeRichDm. Returns null if the plaintext isn't rich. */
+export function decodeRichDm(plaintext: string): RichDmPayload | null {
+  if (!plaintext) return null;
+  if (plaintext[0] !== "{") return null;
+  try {
+    const parsed = JSON.parse(plaintext) as { v?: number } & RichDmPayload;
+    if (parsed.v !== 1 || typeof parsed.text !== "string") return null;
+    return { text: parsed.text, attachments: parsed.attachments };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Decrypt an EncryptedDm using the recipient's keypair. Returns null if
  * the ciphertext can't be opened (wrong recipient, tampered, etc.).
@@ -202,6 +242,27 @@ export class DmClient {
     if (!peer) throw new Error(`Recipient TID ${recipientTid} has no DM key`);
     const encrypted = encryptDm(plaintext, peer.x25519_pubkey, senderKeypair);
     return this.send(senderTid, recipientTid, encrypted, appSigningKey);
+  }
+
+  /**
+   * Send a rich DM (text + attachments). The whole RichDmPayload
+   * is JSON-encoded and put through the same encryption path as
+   * plain text — recipient calls decryptDm then decodeRichDm.
+   */
+  async sendRich(
+    senderTid: bigint,
+    recipientTid: bigint,
+    payload: RichDmPayload,
+    appSigningKey: Uint8Array,
+    senderKeypair: nacl.BoxKeyPair
+  ): Promise<{ hash: string; conversationId: string }> {
+    return this.sendText(
+      senderTid,
+      recipientTid,
+      encodeRichDm(payload),
+      appSigningKey,
+      senderKeypair
+    );
   }
 
   /** List the conversations a TID is a participant in, newest first. */
