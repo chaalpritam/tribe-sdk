@@ -26,6 +26,26 @@ export enum MessageType {
   CROWDFUND_ADD = 23,
   CROWDFUND_PLEDGE = 24,
   TIP_ADD = 25,
+  DM_GROUP_CREATE = 26,
+  DM_GROUP_SEND = 27,
+}
+
+export interface DmGroupCreateBody {
+  groupId: string;
+  name: string;
+  memberTids: string[];
+}
+
+export interface DmGroupCipher {
+  recipientTid: string;
+  ciphertext: string;
+  nonce: string;
+}
+
+export interface DmGroupSendBody {
+  groupId: string;
+  senderX25519: string;
+  ciphertexts: DmGroupCipher[];
 }
 
 export interface TipAddBody {
@@ -166,7 +186,9 @@ export type MessageBody =
   | TaskTransitionBody
   | CrowdfundAddBody
   | CrowdfundPledgeBody
-  | TipAddBody;
+  | TipAddBody
+  | DmGroupCreateBody
+  | DmGroupSendBody;
 
 export interface MessageData {
   type: MessageType;

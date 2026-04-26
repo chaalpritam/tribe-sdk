@@ -36,6 +36,37 @@ export interface DecryptedDm extends Omit<EncryptedDm, "ciphertext"> {
   text: string;
 }
 
+export interface DmGroupSummary {
+  id: string;
+  name: string;
+  creator_tid: string;
+  created_at: string;
+  joined_at: string;
+  member_count: number;
+}
+
+export interface DmGroupMember {
+  tid: string;
+  joined_at: string;
+}
+
+export interface DmGroup {
+  id: string;
+  name: string;
+  creator_tid: string;
+  created_at: string;
+  members: DmGroupMember[];
+}
+
+export interface EncryptedGroupDm {
+  hash: string;
+  sender_tid: string;
+  sender_x25519: string;
+  timestamp: string;
+  ciphertext: string;
+  nonce: string;
+}
+
 function toBase64(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64");
 }
@@ -208,6 +239,100 @@ export class DmClient {
     });
   }
 
+  // ── Group DMs ───────────────────────────────────────────────────
+
+  /** Create a group DM. Caller is implicitly added as a member. */
+  async createGroup(
+    creatorTid: bigint,
+    groupId: string,
+    name: string,
+    memberTids: bigint[],
+    appSigningKey: Uint8Array
+  ): Promise<{ groupId: string }> {
+    const wireBody = {
+      group_id: groupId,
+      name,
+      member_tids: memberTids.map((m) => m.toString()),
+    };
+    const message = this.sign(
+      MessageType.DM_GROUP_CREATE,
+      creatorTid,
+      wireBody,
+      appSigningKey
+    );
+    const result = await this.post<{ group_id: string }>(
+      "/v1/dm/groups/create",
+      message
+    );
+    return { groupId: result.group_id };
+  }
+
+  /**
+   * Send a group DM. Caller must encrypt the plaintext separately
+   * for each recipient using their x25519 pubkey (see encryptDm).
+   */
+  async sendToGroup(
+    senderTid: bigint,
+    groupId: string,
+    senderX25519: string,
+    ciphertexts: Array<{ recipientTid: bigint; ciphertext: string; nonce: string }>,
+    appSigningKey: Uint8Array
+  ): Promise<{ hash: string; groupId: string }> {
+    const wireBody = {
+      group_id: groupId,
+      sender_x25519: senderX25519,
+      ciphertexts: ciphertexts.map((c) => ({
+        recipient_tid: c.recipientTid.toString(),
+        ciphertext: c.ciphertext,
+        nonce: c.nonce,
+      })),
+    };
+    const message = this.sign(
+      MessageType.DM_GROUP_SEND,
+      senderTid,
+      wireBody,
+      appSigningKey
+    );
+    const result = await this.post<{ hash: string; group_id: string }>(
+      "/v1/dm/groups/send",
+      message
+    );
+    return { hash: result.hash, groupId: result.group_id };
+  }
+
+  async groupsForTid(tid: bigint): Promise<DmGroupSummary[]> {
+    const res = await fetch(`${this.hubUrl}/v1/dm/groups/member/${tid}`);
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    const json = (await res.json()) as { groups: DmGroupSummary[] };
+    return json.groups;
+  }
+
+  async getGroup(groupId: string): Promise<DmGroup | null> {
+    const res = await fetch(
+      `${this.hubUrl}/v1/dm/groups/${encodeURIComponent(groupId)}`
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    return (await res.json()) as DmGroup;
+  }
+
+  async groupMessages(
+    groupId: string,
+    tid: bigint,
+    limit = 50
+  ): Promise<EncryptedGroupDm[]> {
+    const params = new URLSearchParams({
+      tid: tid.toString(),
+      limit: String(limit),
+    });
+    const res = await fetch(
+      `${this.hubUrl}/v1/dm/groups/${encodeURIComponent(groupId)}/messages?${params}`
+    );
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    const json = (await res.json()) as { messages: EncryptedGroupDm[] };
+    return json.messages;
+  }
+
   private network(): Network {
     return this.config.cluster === "mainnet-beta"
       ? Network.MAINNET
@@ -221,7 +346,7 @@ export class DmClient {
   private sign(
     type: MessageType,
     tid: bigint,
-    wireBody: Record<string, string>,
+    wireBody: Record<string, unknown>,
     appSigningKey: Uint8Array
   ): TribeMessage {
     const data: MessageData = {
