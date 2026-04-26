@@ -11,6 +11,7 @@ export const LOCALNET_CONFIG: NetworkConfig = {
     usernameRegistry: new PublicKey("65oKjSjcGYR61ASzDYczbodz6H8TARtJyQGvb5V9y9W1"),
     socialGraph: new PublicKey("8kKnWvbmTjWq5uPePk79RRbQMAXCszNFzHdRwUS4N74w"),
     tipRegistry: new PublicKey("TipReg1111111111111111111111111111111111111"),
+    crowdfundRegistry: new PublicKey("CrowdF11111111111111111111111111111111111111"),
   },
   hubUrl: "http://localhost:4000",
   erServerUrl: "http://localhost:3003",

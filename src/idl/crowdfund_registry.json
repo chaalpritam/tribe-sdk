@@ -1,0 +1,850 @@
+{
+  "address": "CrowdF11111111111111111111111111111111111111",
+  "metadata": {
+    "name": "crowdfund_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain crowdfund campaigns + escrow for the Tribe protocol"
+  },
+  "instructions": [
+    {
+      "name": "claim_funds",
+      "docs": [
+        "Creator-only. Once the deadline has passed and the goal is",
+        "met, sweep the vault into the creator's wallet and mark the",
+        "campaign succeeded."
+      ],
+      "discriminator": [
+        145,
+        36,
+        143,
+        242,
+        168,
+        66,
+        200,
+        155
+      ],
+      "accounts": [
+        {
+          "name": "crowdfund",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  114,
+                  111,
+                  119,
+                  100,
+                  102,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund.crowdfund_id",
+                "account": "Crowdfund"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "crowdfund"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_crowdfund",
+      "docs": [
+        "Create a new crowdfund campaign. Initializes the Crowdfund PDA",
+        "and an empty vault PDA that will hold escrowed lamports until",
+        "the deadline."
+      ],
+      "discriminator": [
+        142,
+        70,
+        11,
+        110,
+        16,
+        180,
+        1,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  102,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "crowdfund",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  114,
+                  111,
+                  119,
+                  100,
+                  102,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "creator_state.next_crowdfund_id",
+                "account": "CreatorCrowdfundState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "creator_state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "goal_amount",
+          "type": "u64"
+        },
+        {
+          "name": "deadline_at",
+          "type": "i64"
+        },
+        {
+          "name": "metadata_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_creator_state",
+      "docs": [
+        "One-time per-creator setup. Creates the CreatorCrowdfundState",
+        "PDA tracking a monotonic `next_crowdfund_id` so each campaign",
+        "gets a deterministic PDA."
+      ],
+      "discriminator": [
+        105,
+        60,
+        2,
+        31,
+        14,
+        151,
+        165,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "creator_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  102,
+                  45,
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "creator_tid",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "pledge",
+      "docs": [
+        "Pledge `amount` lamports to a campaign. Transfers from the",
+        "backer's wallet into the campaign vault and creates (or",
+        "accumulates onto) the backer's Pledge PDA. Rejected after the",
+        "deadline or once the campaign has been claimed/refunded."
+      ],
+      "discriminator": [
+        235,
+        47,
+        156,
+        254,
+        0,
+        88,
+        212,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "crowdfund",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  114,
+                  111,
+                  119,
+                  100,
+                  102,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund.creator",
+                "account": "Crowdfund"
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund.crowdfund_id",
+                "account": "Crowdfund"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pledge",
+          "docs": [
+            "init_if_needed lets the same backer pledge multiple times,",
+            "accumulating onto the same Pledge record."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund"
+              },
+              {
+                "kind": "account",
+                "path": "backer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "backer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "backer_tid",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "refund",
+      "docs": [
+        "Backer-only. Once the deadline has passed and the goal was",
+        "NOT met, return the backer's pledge from the vault. Closes the",
+        "Pledge PDA and reclaims its rent to the backer."
+      ],
+      "discriminator": [
+        2,
+        96,
+        183,
+        251,
+        63,
+        208,
+        46,
+        46
+      ],
+      "accounts": [
+        {
+          "name": "crowdfund",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  114,
+                  111,
+                  119,
+                  100,
+                  102,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund.creator",
+                "account": "Crowdfund"
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund.crowdfund_id",
+                "account": "Crowdfund"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pledge",
+          "docs": [
+            "Closes on success — Pledge rent goes back to the backer."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  101,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "crowdfund"
+              },
+              {
+                "kind": "account",
+                "path": "backer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "backer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "pledge"
+          ]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CreatorCrowdfundState",
+      "discriminator": [
+        152,
+        223,
+        1,
+        11,
+        111,
+        207,
+        215,
+        35
+      ]
+    },
+    {
+      "name": "Crowdfund",
+      "discriminator": [
+        82,
+        194,
+        234,
+        235,
+        221,
+        182,
+        22,
+        124
+      ]
+    },
+    {
+      "name": "Pledge",
+      "discriminator": [
+        161,
+        197,
+        121,
+        46,
+        99,
+        75,
+        169,
+        131
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "CreatorStateInitialized",
+      "discriminator": [
+        230,
+        161,
+        41,
+        5,
+        138,
+        206,
+        69,
+        157
+      ]
+    },
+    {
+      "name": "CrowdfundClaimed",
+      "discriminator": [
+        44,
+        26,
+        42,
+        183,
+        234,
+        245,
+        78,
+        142
+      ]
+    },
+    {
+      "name": "CrowdfundCreated",
+      "discriminator": [
+        222,
+        15,
+        129,
+        174,
+        34,
+        182,
+        7,
+        78
+      ]
+    },
+    {
+      "name": "CrowdfundPledged",
+      "discriminator": [
+        253,
+        116,
+        70,
+        144,
+        13,
+        116,
+        165,
+        209
+      ]
+    },
+    {
+      "name": "CrowdfundRefunded",
+      "discriminator": [
+        116,
+        25,
+        110,
+        142,
+        53,
+        0,
+        68,
+        212
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ZeroGoal",
+      "msg": "Goal amount must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "ZeroPledge",
+      "msg": "Pledge amount must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "DeadlineInPast",
+      "msg": "Deadline must be in the future"
+    },
+    {
+      "code": 6003,
+      "name": "AfterDeadline",
+      "msg": "Campaign has already passed its deadline"
+    },
+    {
+      "code": 6004,
+      "name": "BeforeDeadline",
+      "msg": "Campaign deadline has not been reached yet"
+    },
+    {
+      "code": 6005,
+      "name": "NotActive",
+      "msg": "Campaign is not active"
+    },
+    {
+      "code": 6006,
+      "name": "GoalNotMet",
+      "msg": "Campaign goal was not met; creator cannot claim funds"
+    },
+    {
+      "code": 6007,
+      "name": "GoalMet",
+      "msg": "Campaign goal was met; backers cannot refund"
+    },
+    {
+      "code": 6008,
+      "name": "AlreadyRefunded",
+      "msg": "Pledge has already been refunded"
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatorCrowdfundState",
+      "docs": [
+        "Per-creator counter. Lives at PDA `[\"cf-creator\", creator_pubkey]`.",
+        "Each crowdfund the creator creates consumes the current",
+        "`next_crowdfund_id` and increments it, so campaign PDAs are",
+        "deterministic and globally unique per creator."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "next_crowdfund_id",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatorStateInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Crowdfund",
+      "docs": [
+        "One per campaign. Lives at PDA",
+        "`[\"crowdfund\", creator_pubkey, crowdfund_id_le]`. This PDA",
+        "doubles as the lamport vault — the program owns it, so pledges",
+        "transfer in via System CPI and claim/refund move lamports out",
+        "via direct mutation. The on-chain rent-exempt minimum sits",
+        "alongside `total_pledged` and is never touched."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "crowdfund_id",
+            "type": "u64"
+          },
+          {
+            "name": "goal_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_pledged",
+            "type": "u64"
+          },
+          {
+            "name": "pledge_count",
+            "type": "u32"
+          },
+          {
+            "name": "deadline_at",
+            "type": "i64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "metadata_hash",
+            "docs": [
+              "Hash of the off-chain CROWDFUND_ADD message that carries",
+              "title / description / image_url / currency, etc."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrowdfundClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crowdfund",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_pledged",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrowdfundCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crowdfund",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator_tid",
+            "type": "u64"
+          },
+          {
+            "name": "crowdfund_id",
+            "type": "u64"
+          },
+          {
+            "name": "goal_amount",
+            "type": "u64"
+          },
+          {
+            "name": "deadline_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrowdfundPledged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crowdfund",
+            "type": "pubkey"
+          },
+          {
+            "name": "backer",
+            "type": "pubkey"
+          },
+          {
+            "name": "backer_tid",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_pledged",
+            "type": "u64"
+          },
+          {
+            "name": "pledge_count",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrowdfundRefunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crowdfund",
+            "type": "pubkey"
+          },
+          {
+            "name": "backer",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pledge",
+      "docs": [
+        "One per (crowdfund, backer). Lives at PDA",
+        "`[\"pledge\", crowdfund_pubkey, backer_pubkey]`. Re-pledging",
+        "accumulates onto the same record; refund closes the account and",
+        "returns rent to the backer."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "crowdfund",
+            "type": "pubkey"
+          },
+          {
+            "name": "backer",
+            "type": "pubkey"
+          },
+          {
+            "name": "backer_tid",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "pledged_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

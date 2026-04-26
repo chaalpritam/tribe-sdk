@@ -10,6 +10,7 @@ export interface NetworkConfig {
     usernameRegistry: PublicKey;
     socialGraph: PublicKey;
     tipRegistry: PublicKey;
+    crowdfundRegistry: PublicKey;
   };
   hubUrl: string;
   erServerUrl?: string;
