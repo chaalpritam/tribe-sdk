@@ -27,4 +27,5 @@ export {
   UserProfileFields,
   HubUserResponse,
 } from "./social/user-data";
+export { ChannelClient, ChannelInfo, ChannelMember } from "./social/channels";
 export * from "./messages";

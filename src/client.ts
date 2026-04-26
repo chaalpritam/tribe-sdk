@@ -12,6 +12,7 @@ import { GraphClient } from "./social/graph";
 import { TweetClient } from "./social/tweets";
 import { DmClient } from "./social/dms";
 import { UserDataClient } from "./social/user-data";
+import { ChannelClient } from "./social/channels";
 
 export interface TribeClientOptions {
   /** Override the default ExecutionProvider (DirectSolanaProvider). */
@@ -38,6 +39,7 @@ export class TribeClient {
   public readonly tweets: TweetClient;
   public readonly dms: DmClient;
   public readonly userData: UserDataClient;
+  public readonly channels: ChannelClient;
 
   private constructor(
     provider: AnchorProvider,
@@ -65,6 +67,9 @@ export class TribeClient {
 
     // Profile fields (bio, displayName, pfpUrl, ...).
     this.userData = new UserDataClient(config);
+
+    // Channel directory + create/join/leave.
+    this.channels = new ChannelClient(config);
   }
 
   /** Connect to Solana devnet. */
