@@ -8,18 +8,6 @@ import type {
   TweetRemoveBody,
   ReactionBody,
   UserDataBody,
-  BookmarkBody,
-  ChannelAddBody,
-  ChannelMembershipBody,
-  PollAddBody,
-  PollVoteBody,
-  EventAddBody,
-  EventRsvpBody,
-  TaskAddBody,
-  TaskTransitionBody,
-  CrowdfundAddBody,
-  CrowdfundPledgeBody,
-  TipAddBody,
 } from "./types";
 
 /**
@@ -102,6 +90,12 @@ export function verifyMessage(message: TribeMessage): boolean {
  * header (type/tid/timestamp/network), letting an attacker swap the
  * body without invalidating the signature. Throwing on unsupported
  * types makes the failure loud instead of silent.
+ *
+ * Field reads accept both snake_case and camelCase keys: the wire
+ * format hubs/tribe-app already speak is snake_case (matching the .proto
+ * source), but several callers in this SDK pass camelCase via typed
+ * body objects. Honouring both keeps the body bytes hashed regardless
+ * of which convention the caller used.
  */
 function encodeMessageData(data: MessageData): Uint8Array {
   const protoData: tribe.IMessageData = {
@@ -111,163 +105,149 @@ function encodeMessageData(data: MessageData): Uint8Array {
     network: data.network as number as tribe.Network,
   };
 
+  const body = data.body as unknown as Record<string, unknown>;
+
   switch (data.type) {
     case MessageType.TWEET_ADD: {
-      const body = data.body as TweetAddBody;
       protoData.tweetAdd = {
-        text: body.text,
-        mentions: body.mentions.map(Number),
-        embeds: body.embeds,
-        parentHash: body.parentHash || new Uint8Array(0),
-        channelId: body.channelId || "",
+        text: pickString(body, "text"),
+        mentions: pickArray(body, "mentions").map((m) => Number(m)),
+        embeds: pickArray<string>(body, "embeds"),
+        parentHash: pickBytes(body, "parent_hash", "parentHash") ?? new Uint8Array(0),
+        channelId: pickString(body, "channel_id", "channelId"),
       };
       break;
     }
     case MessageType.TWEET_REMOVE: {
-      const body = data.body as TweetRemoveBody;
       protoData.tweetRemove = {
-        targetHash: body.targetHash,
+        targetHash: pickBytes(body, "target_hash", "targetHash") ?? new Uint8Array(0),
       };
       break;
     }
     case MessageType.REACTION_ADD:
     case MessageType.REACTION_REMOVE: {
-      const body = data.body as ReactionBody;
       protoData.reaction = {
-        type: body.type as number as tribe.ReactionType,
-        targetHash: body.targetHash,
+        type: pickNumber(body, "type") as number as tribe.ReactionType,
+        targetHash: pickBytes(body, "target_hash", "targetHash") ?? new Uint8Array(0),
       };
       break;
     }
     case MessageType.USER_DATA_ADD: {
-      const body = data.body as UserDataBody;
       protoData.userData = {
-        field: body.field,
-        value: body.value,
+        field: pickString(body, "field"),
+        value: pickString(body, "value"),
       };
       break;
     }
     case MessageType.BOOKMARK_ADD:
     case MessageType.BOOKMARK_REMOVE: {
-      const body = data.body as BookmarkBody;
       protoData.bookmark = {
-        targetHash: body.targetHash,
+        targetHash: pickString(body, "target_hash", "targetHash"),
       };
       break;
     }
     case MessageType.CHANNEL_ADD: {
-      const body = data.body as ChannelAddBody;
       protoData.channelAdd = {
-        channelId: body.channelId,
-        name: body.name,
-        description: body.description ?? "",
-        kind: body.kind as number as tribe.ChannelKind,
-        latitude: body.latitude ?? 0,
-        longitude: body.longitude ?? 0,
+        channelId: pickString(body, "channel_id", "channelId"),
+        name: pickString(body, "name"),
+        description: pickString(body, "description"),
+        kind: pickNumber(body, "kind") as number as tribe.ChannelKind,
+        latitude: pickNumber(body, "latitude"),
+        longitude: pickNumber(body, "longitude"),
       };
       break;
     }
     case MessageType.CHANNEL_JOIN:
     case MessageType.CHANNEL_LEAVE: {
-      const body = data.body as ChannelMembershipBody;
       protoData.channelMembership = {
-        channelId: body.channelId,
+        channelId: pickString(body, "channel_id", "channelId"),
       };
       break;
     }
     case MessageType.POLL_ADD: {
-      const body = data.body as PollAddBody;
       protoData.pollAdd = {
-        pollId: body.pollId,
-        question: body.question,
-        options: body.options,
-        expiresAt: body.expiresAt ?? 0,
-        channelId: body.channelId ?? "",
+        pollId: pickString(body, "poll_id", "pollId"),
+        question: pickString(body, "question"),
+        options: pickArray<string>(body, "options"),
+        expiresAt: pickNumber(body, "expires_at", "expiresAt"),
+        channelId: pickString(body, "channel_id", "channelId"),
       };
       break;
     }
     case MessageType.POLL_VOTE: {
-      const body = data.body as PollVoteBody;
       protoData.pollVote = {
-        pollId: body.pollId,
-        optionIndex: body.optionIndex,
+        pollId: pickString(body, "poll_id", "pollId"),
+        optionIndex: pickNumber(body, "option_index", "optionIndex"),
       };
       break;
     }
     case MessageType.EVENT_ADD: {
-      const body = data.body as EventAddBody;
       protoData.eventAdd = {
-        eventId: body.eventId,
-        title: body.title,
-        description: body.description ?? "",
-        startsAt: body.startsAt,
-        endsAt: body.endsAt ?? 0,
-        locationText: body.locationText ?? "",
-        latitude: body.latitude ?? 0,
-        longitude: body.longitude ?? 0,
-        channelId: body.channelId ?? "",
-        imageUrl: body.imageUrl ?? "",
+        eventId: pickString(body, "event_id", "eventId"),
+        title: pickString(body, "title"),
+        description: pickString(body, "description"),
+        startsAt: pickNumber(body, "starts_at", "startsAt"),
+        endsAt: pickNumber(body, "ends_at", "endsAt"),
+        locationText: pickString(body, "location_text", "locationText"),
+        latitude: pickNumber(body, "latitude"),
+        longitude: pickNumber(body, "longitude"),
+        channelId: pickString(body, "channel_id", "channelId"),
+        imageUrl: pickString(body, "image_url", "imageUrl"),
       };
       break;
     }
     case MessageType.EVENT_RSVP: {
-      const body = data.body as EventRsvpBody;
       protoData.eventRsvp = {
-        eventId: body.eventId,
-        status: body.status,
+        eventId: pickString(body, "event_id", "eventId"),
+        status: pickString(body, "status"),
       };
       break;
     }
     case MessageType.TASK_ADD: {
-      const body = data.body as TaskAddBody;
       protoData.taskAdd = {
-        taskId: body.taskId,
-        title: body.title,
-        description: body.description ?? "",
-        rewardText: body.rewardText ?? "",
-        channelId: body.channelId ?? "",
+        taskId: pickString(body, "task_id", "taskId"),
+        title: pickString(body, "title"),
+        description: pickString(body, "description"),
+        rewardText: pickString(body, "reward_text", "rewardText"),
+        channelId: pickString(body, "channel_id", "channelId"),
       };
       break;
     }
     case MessageType.TASK_CLAIM:
     case MessageType.TASK_COMPLETE: {
-      const body = data.body as TaskTransitionBody;
       protoData.taskTransition = {
-        taskId: body.taskId,
+        taskId: pickString(body, "task_id", "taskId"),
       };
       break;
     }
     case MessageType.CROWDFUND_ADD: {
-      const body = data.body as CrowdfundAddBody;
       protoData.crowdfundAdd = {
-        crowdfundId: body.crowdfundId,
-        title: body.title,
-        description: body.description ?? "",
-        goalAmount: body.goalAmount,
-        currency: body.currency ?? "",
-        deadlineAt: body.deadlineAtUnix ?? 0,
-        imageUrl: body.imageUrl ?? "",
-        channelId: body.channelId ?? "",
+        crowdfundId: pickString(body, "crowdfund_id", "crowdfundId"),
+        title: pickString(body, "title"),
+        description: pickString(body, "description"),
+        goalAmount: pickNumber(body, "goal_amount", "goalAmount"),
+        currency: pickString(body, "currency"),
+        deadlineAt: pickNumber(body, "deadline_at", "deadlineAtUnix", "deadlineAt"),
+        imageUrl: pickString(body, "image_url", "imageUrl"),
+        channelId: pickString(body, "channel_id", "channelId"),
       };
       break;
     }
     case MessageType.CROWDFUND_PLEDGE: {
-      const body = data.body as CrowdfundPledgeBody;
       protoData.crowdfundPledge = {
-        crowdfundId: body.crowdfundId,
-        amount: body.amount,
-        currency: body.currency ?? "",
+        crowdfundId: pickString(body, "crowdfund_id", "crowdfundId"),
+        amount: pickNumber(body, "amount"),
+        currency: pickString(body, "currency"),
       };
       break;
     }
     case MessageType.TIP_ADD: {
-      const body = data.body as TipAddBody;
       protoData.tipAdd = {
-        recipientTid: Number(body.recipientTid),
-        amount: body.amount,
-        currency: body.currency ?? "",
-        targetHash: body.targetHash ?? "",
-        txSignature: body.txSignature ?? "",
+        recipientTid: Number(pickString(body, "recipient_tid", "recipientTid") || pickNumber(body, "recipient_tid", "recipientTid")),
+        amount: pickNumber(body, "amount"),
+        currency: pickString(body, "currency"),
+        targetHash: pickString(body, "target_hash", "targetHash"),
+        txSignature: pickString(body, "tx_signature", "txSignature"),
       };
       break;
     }
@@ -278,6 +258,68 @@ function encodeMessageData(data: MessageData): Uint8Array {
   }
 
   return tribe.MessageData.encode(protoData).finish();
+}
+
+function pickString(
+  body: Record<string, unknown>,
+  ...keys: string[]
+): string {
+  for (const k of keys) {
+    const v = body[k];
+    if (typeof v === "string") return v;
+  }
+  return "";
+}
+
+function pickNumber(
+  body: Record<string, unknown>,
+  ...keys: string[]
+): number {
+  for (const k of keys) {
+    const v = body[k];
+    if (typeof v === "number") return v;
+    if (typeof v === "bigint") return Number(v);
+    if (typeof v === "string" && v !== "") {
+      const n = Number(v);
+      if (Number.isFinite(n)) return n;
+    }
+  }
+  return 0;
+}
+
+function pickArray<T>(
+  body: Record<string, unknown>,
+  ...keys: string[]
+): T[] {
+  for (const k of keys) {
+    const v = body[k];
+    if (Array.isArray(v)) return v as T[];
+  }
+  return [];
+}
+
+function pickBytes(
+  body: Record<string, unknown>,
+  ...keys: string[]
+): Uint8Array | undefined {
+  for (const k of keys) {
+    const v = body[k];
+    if (v instanceof Uint8Array) return v;
+    if (typeof v === "string" && v !== "") {
+      // Heuristic: treat hex (only 0-9a-f, even length) as hex; otherwise base64.
+      // Hashes are typically delivered as hex from on-chain reads or as base64
+      // from gossip/wire — both decode to the same bytes.
+      try {
+        if (/^[0-9a-fA-F]+$/.test(v) && v.length % 2 === 0) {
+          return new Uint8Array(Buffer.from(v, "hex"));
+        }
+        return new Uint8Array(Buffer.from(v, "base64"));
+      } catch {
+        return undefined;
+      }
+    }
+  }
+  return undefined;
 }
 
 /**
