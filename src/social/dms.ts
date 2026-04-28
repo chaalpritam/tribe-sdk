@@ -502,6 +502,7 @@ export class DmClient {
         ...message.data,
         tid: message.data.tid.toString(),
       },
+      dataB64: toBase64(message.dataBytes),
       hash: toBase64(message.hash),
       signature: toBase64(message.signature),
       signer: toBase64(message.signer),

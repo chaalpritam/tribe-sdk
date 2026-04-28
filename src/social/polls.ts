@@ -129,6 +129,7 @@ export class PollClient {
         {
           protocolVersion: message.protocolVersion,
           data: message.data,
+          dataB64: Buffer.from(message.dataBytes).toString("base64"),
           hash: Buffer.from(message.hash).toString("base64"),
           signature: Buffer.from(message.signature).toString("base64"),
           signer: Buffer.from(message.signer).toString("base64"),
