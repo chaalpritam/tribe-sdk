@@ -3,7 +3,6 @@ import { signMessage } from "../messages/signer";
 import {
   MessageType,
   MessageData,
-  TweetAddBody,
   Network,
   TribeMessage,
   GENERAL_CHANNEL_ID,
@@ -54,20 +53,25 @@ export class TweetClient {
     // protocol's "post to everyone" default.
     const channelId = options?.channelId?.trim() || GENERAL_CHANNEL_ID;
 
-    const body: TweetAddBody = {
+    // Wire format is snake_case to match the hub's submit route + the
+    // .proto source-of-truth field names. The encoder reads either
+    // case, so what really matters here is alignment with the hub.
+    const wireBody: Record<string, unknown> = {
       text,
-      mentions: options?.mentions ?? [],
+      mentions: (options?.mentions ?? []).map((m) => m.toString()),
       embeds: options?.embeds ?? [],
-      parentHash: options?.parentHash,
-      channelId,
+      channel_id: channelId,
     };
+    if (options?.parentHash) {
+      wireBody.parent_hash = Buffer.from(options.parentHash).toString("base64");
+    }
 
     const data: MessageData = {
       type: MessageType.TWEET_ADD,
       tid,
       timestamp: Math.floor(Date.now() / 1000),
       network: this.config.cluster === "mainnet-beta" ? Network.MAINNET : Network.DEVNET,
-      body,
+      body: wireBody as unknown as MessageData["body"],
     };
 
     const message = signMessage(data, signingKey);
