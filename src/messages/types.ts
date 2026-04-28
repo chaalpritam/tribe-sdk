@@ -240,6 +240,13 @@ export interface MessageData {
 export interface TribeMessage {
   protocolVersion: number;
   data: MessageData;
+  /**
+   * The exact bytes that were hashed to produce `hash`. Carrying these on
+   * the wire lets verifiers recompute blake3(dataBytes) and confirm the
+   * projected fields haven't been tampered with — without this, a relay
+   * could swap the body and the signature would still verify.
+   */
+  dataBytes: Uint8Array;
   hash: Uint8Array;
   signature: Uint8Array;
   signer: Uint8Array;
