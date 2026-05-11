@@ -12,6 +12,7 @@ export type UserDataField =
   | "bio"
   | "displayName"
   | "pfpUrl"
+  | "coverUrl"
   | "url"
   | "location"
   | "city";
@@ -20,6 +21,8 @@ export interface UserProfileFields {
   bio?: string;
   displayName?: string;
   pfpUrl?: string;
+  /** URL of the profile cover / banner image. */
+  coverUrl?: string;
   url?: string;
   location?: string;
   city?: string;
