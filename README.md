@@ -284,10 +284,12 @@ tribe-sdk/
 
 | Repo | Description |
 |------|-------------|
-| [tribe-protocol](../tribe-protocol) | Solana programs (Anchor) -- identity, keys, usernames, social graph |
-| [tribe-hub](../tribe-hub) | Decentralized hub -- tweet storage, indexing, gossip sync |
-| [tribe-er-server](../tribe-er-server) | Ephemeral Rollup sequencer -- instant follows, batched L1 settlement |
-| [tribe-app](../tribe-app) | Next.js frontend -- 10 pages with multi-node failover |
+| [tribe-protocol](../tribe-protocol) | Solana programs (Anchor) — identity, app keys, usernames, social graph, and more |
+| [tribe-hub](../tribe-hub) | Decentralized hub — message storage, indexing, gossip sync |
+| [tribe-er-server](../tribe-er-server) | Ephemeral Rollup sequencer — instant follows, batched L1 settlement |
+| [tribe-app](../tribe-app) | Next.js frontend — reference client with multi-node failover |
+| [tribeapp.wtf](../tribeapp.wtf) | Consumer-facing web app + landing page |
+| [tribe-ios](../tribe-ios) | Native SwiftUI iOS client |
 
 ## License
 
