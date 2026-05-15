@@ -17,10 +17,19 @@ export interface Tweet {
   parentHash?: string;
   channelId?: string;
   timestamp: number;
+  /** Phase 3: discriminator for IG-shaped feeds. */
+  postKind?: "photo" | "reel" | null;
+  location?: string | null;
+  audioTitle?: string | null;
 }
 
 export interface TweetPage {
   tweets: Tweet[];
+  cursor?: string;
+}
+
+export interface ReelPage {
+  reels: Tweet[];
   cursor?: string;
 }
 
@@ -46,6 +55,10 @@ export class TweetClient {
       embeds?: string[];
       parentHash?: Uint8Array;
       channelId?: string;
+      /** Phase 3: 'photo' for IG photo posts, 'reel' for video posts. */
+      postKind?: "photo" | "reel";
+      location?: string;
+      audioTitle?: string;
     }
   ): Promise<string> {
     // Every tweet must belong to a channel. Fall back to the reserved
@@ -65,6 +78,9 @@ export class TweetClient {
     if (options?.parentHash) {
       wireBody.parent_hash = Buffer.from(options.parentHash).toString("base64");
     }
+    if (options?.postKind) wireBody.post_kind = options.postKind;
+    if (options?.location) wireBody.location = options.location;
+    if (options?.audioTitle) wireBody.audio_title = options.audioTitle;
 
     const data: MessageData = {
       type: MessageType.TWEET_ADD,
@@ -76,6 +92,48 @@ export class TweetClient {
 
     const message = signMessage(data, signingKey);
     return this.submitMessage(message);
+  }
+
+  /**
+   * Publish a reel — sugar over publish() that fixes postKind='reel'
+   * and requires at least one video embed (`media:<hash>`).
+   */
+  async publishReel(
+    tid: bigint,
+    videoEmbed: string,
+    signingKey: Uint8Array,
+    options?: {
+      caption?: string;
+      audioTitle?: string;
+      location?: string;
+      channelId?: string;
+    }
+  ): Promise<string> {
+    return this.publish(
+      tid,
+      options?.caption ?? "",
+      signingKey,
+      {
+        embeds: [videoEmbed],
+        postKind: "reel",
+        audioTitle: options?.audioTitle,
+        location: options?.location,
+        channelId: options?.channelId,
+      }
+    );
+  }
+
+  /**
+   * Paginated reels feed. /v1/reels filters messages on
+   * `post_kind='reel'` — same TWEET_ADD rows the other feed reads
+   * use, just discriminated by the column from migration 028.
+   */
+  async listReels(limit = 20, cursor?: string): Promise<ReelPage> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor) params.set("cursor", cursor);
+    const res = await fetch(`${this.hubUrl}/v1/reels?${params}`);
+    if (!res.ok) throw new Error(`Hub error: ${res.status}`);
+    return (await res.json()) as ReelPage;
   }
 
   /**
