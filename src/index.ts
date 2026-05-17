@@ -10,7 +10,8 @@ export { TidClient, TidRecord } from "./identity/tid";
 export { AppKeyClient, AppKeyRecord, AppKeyScope } from "./identity/app-keys";
 export { UsernameClient, UsernameRecord } from "./identity/usernames";
 export { GraphClient } from "./social/graph";
-export { TweetClient, Tweet, TweetPage } from "./social/tweets";
+export { TweetClient, Tweet, TweetPage, ReelPage } from "./social/tweets";
+export { StoryClient, Story, StoryViewer } from "./social/stories";
 export {
   DmClient,
   DmKeyRecord,

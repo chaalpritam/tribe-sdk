@@ -20,6 +20,7 @@ import { TaskClient } from "./social/tasks";
 import { CrowdfundClient } from "./social/crowdfunds";
 import { TipClient } from "./social/tips";
 import { SearchClient } from "./social/search";
+import { StoryClient } from "./social/stories";
 import { TipOnchainClient } from "./onchain/tip-registry";
 import { CrowdfundOnchainClient } from "./onchain/crowdfund-registry";
 import { TaskOnchainClient } from "./onchain/task-registry";
@@ -61,6 +62,8 @@ export class TribeClient {
   public readonly crowdfunds: CrowdfundClient;
   public readonly tips: TipClient;
   public readonly search: SearchClient;
+  /** Phase 3 — 24h ephemeral stories. */
+  public readonly stories: StoryClient;
   /**
    * On-chain Anchor program clients. These wrap the Solana programs
    * directly (lamport transfers, escrow, voting integrity) — distinct
@@ -127,6 +130,10 @@ export class TribeClient {
 
     // Search — read-only over tweets, users, channels.
     this.search = new SearchClient(config);
+
+    // Stories — 24h ephemeral posts. Reels use the existing TweetClient
+    // (post_kind='reel' on TWEET_ADD), so no separate ReelClient.
+    this.stories = new StoryClient(config);
 
     // On-chain program clients (Anchor-backed).
     this.onchain = {

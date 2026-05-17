@@ -41,6 +41,10 @@ export enum MessageType {
   DM_GROUP_CREATE = 26,
   DM_GROUP_SEND = 27,
   DM_READ = 28,
+  /** Phase 3 — ephemeral story posts. 24h TTL stamped by the hub. */
+  STORY_ADD = 33,
+  /** Phase 3 — mark a story as viewed by the current TID. */
+  STORY_VIEW = 34,
 }
 
 export interface DmReadBody {
@@ -176,6 +180,35 @@ export interface TweetAddBody {
    * GENERAL_CHANNEL_ID when omitted; hubs reject empty values.
    */
   channelId: string;
+  /**
+   * Phase 3 discriminator for IG-shaped feeds. 'photo' for photo posts,
+   * 'reel' for video posts. Plain text tweets leave it undefined.
+   */
+  postKind?: "photo" | "reel";
+  /** Optional free-form location string, e.g. "Brooklyn, NY". */
+  location?: string;
+  /** Reels: the audio attribution shown over the bottom-meta row. */
+  audioTitle?: string;
+}
+
+/**
+ * Body of a STORY_ADD envelope. Stories are 24h ephemeral posts —
+ * the hub stamps `expires_at = created_at + 24h` server-side, so
+ * clients can't lie about TTL.
+ */
+export interface StoryAddBody {
+  /** Media hash from /v1/upload (64-char hex SHA-256). */
+  mediaHash: string;
+  caption?: string;
+  music?: string;
+}
+
+/**
+ * Body of a STORY_VIEW envelope. Idempotent — re-viewing keeps the
+ * original (story_hash, viewer_tid) row's timestamp.
+ */
+export interface StoryViewBody {
+  storyHash: string;
 }
 
 export interface ChannelAddBody {
@@ -227,7 +260,9 @@ export type MessageBody =
   | TipAddBody
   | DmGroupCreateBody
   | DmGroupSendBody
-  | DmReadBody;
+  | DmReadBody
+  | StoryAddBody
+  | StoryViewBody;
 
 export interface MessageData {
   type: MessageType;
