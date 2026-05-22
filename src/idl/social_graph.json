@@ -447,6 +447,63 @@
       ]
     },
     {
+      "name": "update_sequencer",
+      "docs": [
+        "Rotate the sequencer authority. Only the admin from init_sequencer may call this."
+      ],
+      "discriminator": [
+        114,
+        91,
+        189,
+        92,
+        203,
+        56,
+        39,
+        79
+      ],
+      "accounts": [
+        {
+          "name": "sequencer_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  113,
+                  117,
+                  101,
+                  110,
+                  99,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "unfollow",
       "docs": [
         "Unfollow a user. Closes Link PDA + decrements counters + reclaims rent."
@@ -766,6 +823,19 @@
         168,
         239
       ]
+    },
+    {
+      "name": "SequencerRotated",
+      "discriminator": [
+        113,
+        135,
+        235,
+        137,
+        40,
+        78,
+        62,
+        225
+      ]
     }
   ],
   "errors": [
@@ -788,6 +858,11 @@
       "code": 6003,
       "name": "UnauthorizedSequencer",
       "msg": "Unauthorized: signer is not the registered sequencer"
+    },
+    {
+      "code": 6004,
+      "name": "UnauthorizedAdmin",
+      "msg": "Unauthorized: signer is not the sequencer admin"
     }
   ],
   "types": [
@@ -914,6 +989,22 @@
           {
             "name": "following_tid",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SequencerRotated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_authority",
+            "type": "pubkey"
           }
         ]
       }
