@@ -1,5 +1,5 @@
 import { NetworkConfig } from "../network/types";
-import { signMessage } from "../messages/signer";
+import { signJsonMessage } from "../messages/signer";
 import {
   MessageData,
   MessageType,
@@ -15,22 +15,21 @@ export interface Story {
   music: string | null;
   created_at: string;
   expires_at: string;
-  username?: string | null;
-  pfp_url?: string | null;
 }
 
 export interface StoryViewer {
   viewer_tid: string;
   viewed_at: string;
-  username?: string | null;
-  pfp_url?: string | null;
+}
+
+export interface StoryAuthorGroup {
+  author_tid: string;
+  stories: Story[];
 }
 
 /**
- * Stories — 24h ephemeral posts. The hub stamps `expires_at` at
- * insert (`created_at + 24h`) so clients can't dictate TTL, and the
- * hourly stories-cleanup cron purges expired rows (cascading
- * story_views with them).
+ * 24h ephemeral stories (STORY_ADD / STORY_VIEW).
+ * Uses JSON envelope signing until protobuf story bodies ship.
  */
 export class StoryClient {
   private hubUrl: string;
@@ -45,45 +44,32 @@ export class StoryClient {
     signingKey: Uint8Array,
     opts: { caption?: string; music?: string } = {}
   ): Promise<string> {
-    const wireBody: Record<string, unknown> = { media_hash: mediaHash };
-    if (opts.caption) wireBody.caption = opts.caption;
-    if (opts.music) wireBody.music = opts.music;
-    return this.publishEnvelope(MessageType.STORY_ADD, tid, wireBody, signingKey);
+    const body: Record<string, string> = { media_hash: mediaHash };
+    if (opts.caption) body.caption = opts.caption;
+    if (opts.music) body.music = opts.music;
+    return this.publishEnvelope(MessageType.STORY_ADD, tid, body, signingKey);
   }
 
-  /**
-   * Mark a story as viewed by `tid`. The hub upserts a row in
-   * story_views; idempotent — subsequent calls with the same
-   * (story_hash, tid) keep the original viewed_at timestamp.
-   */
-  async view(
-    tid: bigint,
+  async markViewed(
+    viewerTid: bigint,
     storyHash: string,
     signingKey: Uint8Array
   ): Promise<string> {
     return this.publishEnvelope(
       MessageType.STORY_VIEW,
-      tid,
+      viewerTid,
       { story_hash: storyHash },
       signingKey
     );
   }
 
-  /**
-   * All active stories across the network, grouped by author and
-   * newest-first within each. Returns at most `limit` rows total
-   * (default 100, max 200).
-   */
-  async list(opts: { limit?: number } = {}): Promise<Story[]> {
-    const params = new URLSearchParams();
-    if (opts.limit) params.set("limit", String(opts.limit));
-    const res = await fetch(`${this.hubUrl}/v1/stories?${params}`);
+  async listFeed(): Promise<StoryAuthorGroup[]> {
+    const res = await fetch(`${this.hubUrl}/v1/stories`);
     if (!res.ok) throw new Error(`Hub error: ${res.status}`);
-    const json = (await res.json()) as { stories: Story[] };
-    return json.stories;
+    const json = (await res.json()) as { authors: StoryAuthorGroup[] };
+    return json.authors;
   }
 
-  /** One author's currently-active stories, oldest-first. */
   async listByAuthor(tid: bigint): Promise<Story[]> {
     const res = await fetch(`${this.hubUrl}/v1/stories/${tid}`);
     if (!res.ok) throw new Error(`Hub error: ${res.status}`);
@@ -91,32 +77,21 @@ export class StoryClient {
     return json.stories;
   }
 
-  /**
-   * Seen-by list for a story. Pass `viewerTid` to self-gate: a
-   * non-author request gets a 403 from the hub (clients should hide
-   * the entry point in that case).
-   */
-  async viewers(
+  async listViewers(
     storyHash: string,
-    opts: { viewerTid?: bigint } = {}
+    viewerTid: bigint
   ): Promise<StoryViewer[]> {
-    const params = new URLSearchParams();
-    if (opts.viewerTid !== undefined) {
-      params.set("viewer_tid", opts.viewerTid.toString());
-    }
+    const params = new URLSearchParams({ viewer_tid: String(viewerTid) });
     const res = await fetch(
       `${this.hubUrl}/v1/stories/${encodeURIComponent(storyHash)}/viewers?${params}`
     );
     if (res.status === 403) {
-      throw new Error("Only the story's author can see the viewer list");
+      throw new Error("Only the story author can list viewers");
     }
-    if (res.status === 404) return [];
     if (!res.ok) throw new Error(`Hub error: ${res.status}`);
     const json = (await res.json()) as { viewers: StoryViewer[] };
     return json.viewers;
   }
-
-  // MARK: - Internals
 
   private network(): Network {
     return this.config.cluster === "mainnet-beta"
@@ -127,7 +102,7 @@ export class StoryClient {
   private async publishEnvelope(
     type: MessageType,
     tid: bigint,
-    body: Record<string, unknown>,
+    body: Record<string, string>,
     signingKey: Uint8Array
   ): Promise<string> {
     const data: MessageData = {
@@ -137,7 +112,7 @@ export class StoryClient {
       network: this.network(),
       body: body as unknown as MessageData["body"],
     };
-    const message = signMessage(data, signingKey);
+    const message = signJsonMessage(data, signingKey);
     return this.submit(message);
   }
 
@@ -145,23 +120,20 @@ export class StoryClient {
     const res = await fetch(`${this.hubUrl}/v1/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        {
-          protocolVersion: message.protocolVersion,
-          data: message.data,
-          dataB64: Buffer.from(message.dataBytes).toString("base64"),
-          hash: Buffer.from(message.hash).toString("base64"),
-          signature: Buffer.from(message.signature).toString("base64"),
-          signer: Buffer.from(message.signer).toString("base64"),
-        },
-        (_, v) => (typeof v === "bigint" ? v.toString() : v)
-      ),
+      body: JSON.stringify({
+        protocolVersion: message.protocolVersion,
+        data: message.data,
+        dataB64: Buffer.from(message.dataBytes).toString("base64"),
+        hash: Buffer.from(message.hash).toString("base64"),
+        signature: Buffer.from(message.signature).toString("base64"),
+        signer: Buffer.from(message.signer).toString("base64"),
+      }),
     });
     if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`Submit failed: ${res.status} ${txt}`);
+      const err = await res.text();
+      throw new Error(`Submit failed: ${res.status} ${err}`);
     }
-    const out = (await res.json()) as { hash: string };
-    return out.hash;
+    const json = (await res.json()) as { hash: string };
+    return json.hash;
   }
 }
