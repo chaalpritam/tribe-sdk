@@ -21,6 +21,25 @@ export class TidClient {
   }
 
   /**
+   * One-time program setup (deployer / authority). Idempotent if already initialized.
+   */
+  async initialize(): Promise<TransactionSignature> {
+    const [globalState] = PublicKey.findProgramAddressSync(
+      [Buffer.from("global_state")],
+      this.config.programIds.tidRegistry
+    );
+
+    return this.program.methods
+      .initialize()
+      .accounts({
+        globalState,
+        authority: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+  }
+
+  /**
    * Register a new TID for the connected wallet.
    */
   async register(recoveryAddress: PublicKey): Promise<{ tid: bigint; txSig: string }> {
