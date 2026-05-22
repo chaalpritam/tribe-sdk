@@ -2,6 +2,7 @@ import { PublicKey, SystemProgram, TransactionSignature } from "@solana/web3.js"
 import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { NetworkConfig } from "../network/types";
 import usernameIdl from "../idl/username_registry.json";
+import { deriveUsernameRecordPda } from "./username-pda";
 
 export interface UsernameRecord {
   username: string;
@@ -26,8 +27,8 @@ export class UsernameClient {
   async register(tid: bigint, username: string): Promise<TransactionSignature> {
     const tidRecord = this.deriveTidRecord(tid);
 
-    const [usernameRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from(username)],
+    const usernameRecord = deriveUsernameRecordPda(
+      username,
       this.config.programIds.usernameRegistry
     );
 
@@ -54,8 +55,8 @@ export class UsernameClient {
   async renew(tid: bigint, username: string): Promise<TransactionSignature> {
     const tidRecord = this.deriveTidRecord(tid);
 
-    const [usernameRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from(username)],
+    const usernameRecord = deriveUsernameRecordPda(
+      username,
       this.config.programIds.usernameRegistry
     );
 
@@ -79,8 +80,8 @@ export class UsernameClient {
 
     const tidRecord = this.deriveTidRecord(record.tid);
 
-    const [usernameRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from(username)],
+    const usernameRecord = deriveUsernameRecordPda(
+      username,
       this.config.programIds.usernameRegistry
     );
 
@@ -100,8 +101,8 @@ export class UsernameClient {
   async release(tid: bigint, username: string): Promise<TransactionSignature> {
     const tidRecord = this.deriveTidRecord(tid);
 
-    const [usernameRecord] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from(username)],
+    const usernameRecord = deriveUsernameRecordPda(
+      username,
       this.config.programIds.usernameRegistry
     );
 
@@ -125,8 +126,8 @@ export class UsernameClient {
    * Look up a username record.
    */
   async getUsername(username: string): Promise<UsernameRecord | null> {
-    const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from(username)],
+    const pda = deriveUsernameRecordPda(
+      username,
       this.config.programIds.usernameRegistry
     );
 

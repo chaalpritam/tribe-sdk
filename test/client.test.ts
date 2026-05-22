@@ -518,15 +518,17 @@ describe("PDA derivation consistency", () => {
     expect(pda1.equals(pda2)).toBe(true);
   });
 
-  it("username PDA uses correct seeds", () => {
+  it("username PDA uses lowercase seeds (on-chain convention)", async () => {
+    const { deriveUsernameRecordPda } = await import("../src/identity/username-pda");
     const usernameProgram = DEVNET_CONFIG.programIds.usernameRegistry;
-    const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("username"), Buffer.from("alice")],
+    const lower = deriveUsernameRecordPda("alice", usernameProgram);
+    const fromMixed = deriveUsernameRecordPda("Alice", usernameProgram);
+    const wrongCase = PublicKey.findProgramAddressSync(
+      [Buffer.from("username"), Buffer.from("Alice")],
       usernameProgram
-    );
-    // Should be a valid PDA (on the ed25519 curve check is implicit in findProgramAddressSync)
-    expect(pda).toBeInstanceOf(PublicKey);
-    expect(pda.toBase58().length).toBeGreaterThan(0);
+    )[0];
+    expect(fromMixed.equals(lower)).toBe(true);
+    expect(fromMixed.equals(wrongCase)).toBe(false);
   });
 
   it("app_key PDA includes tid and app pubkey in seeds", () => {
