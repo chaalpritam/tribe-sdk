@@ -6,6 +6,10 @@ import { ExecutionProvider, SocialProfile, Link } from "../execution/types";
 export class GraphClient {
   constructor(private execution: ExecutionProvider) {}
 
+  async initProfile(tid: bigint): Promise<string> {
+    return this.execution.initProfile(tid);
+  }
+
   async follow(followerTid: bigint, followingTid: bigint): Promise<string> {
     return this.execution.follow(followerTid, followingTid);
   }

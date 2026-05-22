@@ -21,6 +21,14 @@ export class EphemeralRollupProvider implements ExecutionProvider {
     this.signFn = opts.signFn;
   }
 
+  async initProfile(_tid: bigint): Promise<string> {
+    throw new Error(
+      "initProfile is not available via EphemeralRollupProvider; the ER server " +
+        "auto-initializes profiles during settlement. Use DirectSolanaProvider for " +
+        "explicit L1 profile creation."
+    );
+  }
+
   async follow(followerTid: bigint, followingTid: bigint): Promise<string> {
     return this.submitOperation("follow", followerTid, followingTid);
   }

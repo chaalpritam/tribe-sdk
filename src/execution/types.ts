@@ -17,6 +17,12 @@ export interface Link {
 }
 
 export interface ExecutionProvider {
+  /**
+   * Initialize an on-chain social profile for a TID (required before
+   * direct L1 follow/unfollow). ER settlement auto-inits missing profiles.
+   */
+  initProfile(tid: bigint): Promise<string>;
+
   /** Follow a user. Returns transaction signature. */
   follow(followerTid: bigint, followingTid: bigint): Promise<string>;
 

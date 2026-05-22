@@ -21,6 +21,25 @@ export class DirectSolanaProvider implements ExecutionProvider {
     this.program = new Program(socialGraphIdl as any, provider);
   }
 
+  async initProfile(tid: bigint): Promise<string> {
+    const tidRecord = this.deriveTidRecord(tid);
+
+    const [socialProfile] = PublicKey.findProgramAddressSync(
+      [Buffer.from("social_profile"), this.tidToBuffer(tid)],
+      this.config.programIds.socialGraph
+    );
+
+    return this.program.methods
+      .initProfile()
+      .accounts({
+        tidRecord,
+        socialProfile,
+        custody: this.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+  }
+
   async follow(followerTid: bigint, followingTid: bigint): Promise<string> {
     const followerTidRecord = this.deriveTidRecord(followerTid);
 

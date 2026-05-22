@@ -20,11 +20,11 @@ import {
 import { AnchorProvider, Program, Wallet, BN } from "@coral-xyz/anchor";
 import nacl from "tweetnacl";
 import { TribeClient } from "../src/client";
+import { DirectSolanaProvider } from "../src/execution/direct-solana";
 import { DEVNET_CONFIG } from "../src/network/devnet";
 import { NetworkConfig } from "../src/network/types";
 import { AppKeyScope } from "../src/identity/app-keys";
 import tidRegistryIdl from "../src/idl/tid_registry.json";
-import socialGraphIdl from "../src/idl/social_graph.json";
 import fs from "fs";
 import path from "path";
 
@@ -202,36 +202,24 @@ async function main() {
   const tid2 = user2Result.tid;
   log("5", `User2 registered TID ${tid2}`);
 
-  // Init social profiles (SDK doesn't expose initProfile directly)
-  async function initProfile(profileTid: bigint, signerProvider: AnchorProvider) {
-    const prog = new Program(socialGraphIdl as any, signerProvider);
-    const tidRec = PublicKey.findProgramAddressSync(
-      [Buffer.from("tid"), tidToBuffer(profileTid)],
-      config.programIds.tidRegistry
-    )[0];
+  async function ensureProfile(
+    client: TribeClient,
+    profileTid: bigint,
+    signerProvider: AnchorProvider
+  ) {
     const [profile] = PublicKey.findProgramAddressSync(
       [Buffer.from("social_profile"), tidToBuffer(profileTid)],
       config.programIds.socialGraph
     );
-
-    // Skip if profile already exists
     if (await accountExists(connection, profile)) return;
-
-    return prog.methods
-      .initProfile()
-      .accounts({
-        tidRecord: tidRec,
-        socialProfile: profile,
-        custody: signerProvider.wallet.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    const direct = new DirectSolanaProvider(signerProvider, config);
+    await direct.initProfile(profileTid);
   }
 
-  await initProfile(tid, provider);
+  await ensureProfile(tribe, tid, provider);
   log("5", `Social profile ready for TID ${tid}`);
 
-  await initProfile(tid2, user2Provider);
+  await ensureProfile(user2Tribe, tid2, user2Provider);
   log("5", `Social profile ready for TID ${tid2}`);
 
   // Follow
