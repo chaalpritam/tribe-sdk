@@ -6,6 +6,8 @@ export { LOCALNET_CONFIG } from "./network/localnet";
 export { ExecutionProvider, SocialProfile, Link } from "./execution";
 export { DirectSolanaProvider } from "./execution/direct-solana";
 export { EphemeralRollupProvider } from "./execution/ephemeral-rollup";
+export { SocialGraphAdminClient } from "./execution/social-graph-admin";
+export { deriveUsernameRecordPda, usernameRecordSeed } from "./identity/username-pda";
 export { TidClient, TidRecord } from "./identity/tid";
 export { AppKeyClient, AppKeyRecord, AppKeyScope } from "./identity/app-keys";
 export { UsernameClient, UsernameRecord } from "./identity/usernames";
