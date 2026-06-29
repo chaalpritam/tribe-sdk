@@ -92,7 +92,7 @@ export function verifyMessage(message: TribeMessage): boolean {
  * types makes the failure loud instead of silent.
  *
  * Field reads accept both snake_case and camelCase keys: the wire
- * format hubs/tribe-app already speak is snake_case (matching the .proto
+ * format hubs/tribe-twitter-app already speak is snake_case (matching the .proto
  * source), but several callers in this SDK pass camelCase via typed
  * body objects. Honouring both keeps the body bytes hashed regardless
  * of which convention the caller used.
